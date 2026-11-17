@@ -15,7 +15,7 @@ jobs:
         run: |
           if [ ! -f "app/build.gradle" ]; then
             pip install --quiet gdown
-            gdown --id 18UIG2r-J2carYXMtSy9h_u6Himrt2OUr -O /tmp/project.zip
+            gdown 18UIG2r-J2carYXMtSy9h_u6Himrt2OUr -O /tmp/project.zip
             unzip -q -o /tmp/project.zip -x ".github/*"
             git config user.name "Basel Ashraf ALfakawi"
             git config user.email "baselashraf800@gmail.com"
