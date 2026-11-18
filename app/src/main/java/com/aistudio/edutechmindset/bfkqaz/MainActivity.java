@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             "  }, true);" +
             "  window.__edutechRestoreDrafts = function(){" +
             "    try {" +
-            "      var inputs = document.querySelectorAll('textarea, input[type="text"]');" +
+            "      var inputs = document.querySelectorAll('textarea, input[type=text]');" +
             "      inputs.forEach(function(el){" +
             "        var key = 'edutech_draft_' + (el.id || el.name || location.pathname);" +
             "        var saved = localStorage.getItem(key);" +
@@ -783,8 +783,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent share = new Intent(Intent.ACTION_SEND);
                 share.setType("text/plain");
                 String u = webView != null && webView.getUrl() != null ? webView.getUrl() : HOME_URL;
-                share.putExtra(Intent.EXTRA_TEXT, "🎓 شاهد هذا الدرس على منصة EduTech Mindset:
-" + u);
+               share.putExtra(Intent.EXTRA_TEXT, "EduTech Mindset: " + u);
                 startActivity(Intent.createChooser(share, "مشاركة الدرس"));
             }
         });
@@ -875,8 +874,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (itemList.isEmpty()) {
             TextView empty = new TextView(this);
-            empty.setText("لا توجد ملفات محفوظة بعد في الخزنة المحلية.
-يمكنك تحميل الدروس وأوراق العمل أو تسجيل الملاحظات الصوتية لتظهر هنا وتعمل بدون إنترنت.");
+            empty.setText("لا توجد ملفات محفوظة بعد في الخزنة المحلية.");
             empty.setTextColor(Color.parseColor("#94A3B8"));
             empty.setPadding(dp(8), dp(20), dp(8), dp(20));
             listLayout.addView(empty);
@@ -1136,8 +1134,7 @@ public class MainActivity extends AppCompatActivity {
                 final String htmlUrl = json.optString("html_url", "https://github.com/baselashraf800-afk/edutech-mindset-v2/releases");
                 runOnUiThread(() -> new AlertDialog.Builder(MainActivity.this)
                         .setTitle("🔄 تحديثات EduTech Mindset")
-                        .setMessage("الإصدار المثبت حالياً: v2.1.0
-أحدث إصدار منشور: " + tag)
+                        .setMessage("الإصدار الحالي v2.1.0 | الأحدث: " + tag)
                         .setPositiveButton("فتح صفحة الإصدار", (d, w) -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(htmlUrl))))
                         .setNegativeButton("حسناً", null)
                         .show());
@@ -1332,7 +1329,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (requestCode == REQ_VOICE_INPUT && resultCode == RESULT_OK && data != null) {
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if (matches != null && !matches.isEmpty()) {
-                String spoken = matches.get(0).replace("'", "\'");
+                String spoken = matches.get(0).replace("'", "");
                 webView.evaluateJavascript(
                         "(function(){" +
                         "  var el = document.activeElement;" +
@@ -1351,7 +1348,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp = getSharedPreferences("edutech_session_bridge", MODE_PRIVATE);
         String json = sp.getString("session_json", "");
         if (json != null && !json.isEmpty()) {
-            String safe = json.replace("\", "\\").replace("'", "\'");
+            String safe = json.replace("'", "");
             view.evaluateJavascript(
                     "(function(){ try { var d = JSON.parse('" + safe + "'); for(var k in d){ sessionStorage.setItem(k, d[k]); } } catch(e){} })();",
                     null
