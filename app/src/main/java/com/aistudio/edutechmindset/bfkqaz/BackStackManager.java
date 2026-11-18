@@ -40,7 +40,7 @@ public class BackStackManager {
             try {
                 webView.evaluateJavascript(
                         "(function(){" +
-                        "  var modals = document.querySelectorAll('.modal.open, .modal.active, .fixed.inset-0:not(.hidden), [data-modal-open="true"]');" +
+                        "  var modals = document.querySelectorAll('.modal.open, .modal.active, .fixed.inset-0:not(.hidden), [data-modal-open]');" +
                         "  if (modals && modals.length > 0) {" +
                         "    var closeBtn = modals[modals.length-1].querySelector('[data-close], .close, button');" +
                         "    if (closeBtn) { closeBtn.click(); return 'CLOSED_MODAL'; }" +
