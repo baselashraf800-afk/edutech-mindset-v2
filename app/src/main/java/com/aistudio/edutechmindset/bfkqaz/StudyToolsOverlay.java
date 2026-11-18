@@ -389,7 +389,7 @@ public class StudyToolsOverlay {
 
     private static String formatNumber(double d) {
         if (d == (long) d) return String.format(Locale.US, "%d", (long) d);
-        return String.format(Locale.US, "%.4f", d).replaceAll("0+$", "").replaceAll("\.$", "");
+        return String.format(Locale.US, "%.4f", d).replaceAll("0+$", "").replaceAll("\\.$", "");
     }
 
     private static double evaluateExpression(String raw) {
