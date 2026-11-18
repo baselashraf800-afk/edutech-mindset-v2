@@ -443,11 +443,7 @@ public class EduTechHubSheet {
         List<EduTechPrefs.FlashcardItem> cards = prefs.getFlashcards();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cards.size(); i++) {
-            sb.append("س").append(i + 1).append(": ").append(cards.get(i).question)
-              .append("
-ج: ").append(cards.get(i).answer).append("
-
-");
+            sb.append("س").append(i + 1).append(": ").append(cards.get(i).question).append(" - ج: ").append(cards.get(i).answer).append(" | ");
         }
         new AlertDialog.Builder(activity)
                 .setTitle("🃏 بطاقات المراجعة السريعة (" + cards.size() + ")")
