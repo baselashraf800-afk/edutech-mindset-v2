@@ -44,7 +44,8 @@
 }
 
 /* وضع توفير البيانات v174 */
-body.edu-data-saver img:not([alt*="EduTech"]):not(#homeAds img) { display: none !important; }
+body.edu-data-saver img:not([alt*="EduTech"]) { display: none !important; }
+body.edu-data-saver #homeAds img { display: block !important; }
 body.edu-data-saver .hero-glow { background-image: none !important; }
 
 /* v175: إخفاء زر الإدارة تماماً عن الزوار والطلاب وإظهاره للمشرف العام فقط */

@@ -4,4 +4,8 @@
     <string name="title_activity_main">EduTech Mindset</string>
     <string name="package_name">com.edutechmindset.app</string>
     <string name="custom_url_scheme">edutechmindset</string>
+    <string name="sc_assistant">المساعد الذكي</string>
+    <string name="sc_books">مكتبتي وكتبي</string>
+    <string name="sc_folder">مجلدي وملفاتي</string>
+    <string name="sc_whiteboard">السبورة الذكية</string>
 </resources>

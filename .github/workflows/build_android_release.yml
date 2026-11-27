@@ -41,7 +41,7 @@ jobs:
       - name: Upload APK & AAB Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: EduTech-Mindset-Capacitor-v3.0.0
+          name: EduTech-Mindset-Capacitor-v3.1.0
           path: |
             android/app/build/outputs/apk/**/*.apk
             android/app/build/outputs/bundle/**/*.aab

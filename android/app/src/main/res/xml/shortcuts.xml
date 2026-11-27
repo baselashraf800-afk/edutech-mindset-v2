@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="edutech_assistant"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher_round"
+        android:shortcutShortLabel="@string/sc_assistant"
+        android:shortcutLongLabel="@string/sc_assistant">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.edutechmindset.app"
+            android:targetClass="com.edutechmindset.app.MainActivity">
+            <extra android:name="SHORTCUT_ACTION" android:value="ASSISTANT" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="edutech_books"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher_round"
+        android:shortcutShortLabel="@string/sc_books"
+        android:shortcutLongLabel="@string/sc_books">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.edutechmindset.app"
+            android:targetClass="com.edutechmindset.app.MainActivity">
+            <extra android:name="SHORTCUT_ACTION" android:value="BOOK_READER" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="edutech_folder"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher_round"
+        android:shortcutShortLabel="@string/sc_folder"
+        android:shortcutLongLabel="@string/sc_folder">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.edutechmindset.app"
+            android:targetClass="com.edutechmindset.app.MainActivity">
+            <extra android:name="SHORTCUT_ACTION" android:value="MY_FOLDER" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="edutech_whiteboard"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher_round"
+        android:shortcutShortLabel="@string/sc_whiteboard"
+        android:shortcutLongLabel="@string/sc_whiteboard">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.edutechmindset.app"
+            android:targetClass="com.edutechmindset.app.MainActivity">
+            <extra android:name="SHORTCUT_ACTION" android:value="WHITEBOARD" />
+        </intent>
+    </shortcut>
+</shortcuts>
