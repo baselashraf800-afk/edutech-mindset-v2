@@ -1,50 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mediaRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#020617">
-    <LinearLayout
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/eduPlayerView"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="match_parent"
+        app:use_controller="true"
+        app:show_buffering="when_playing" />
+
+    <!-- Transparent Gesture Overlay for MX Player Brightness / Volume / Seek / Double-Tap -->
+    <View
+        android:id="@+id/gestureOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
+
+    <!-- Top Pro Toolbar -->
+    <LinearLayout
+        android:id="@+id/mediaTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="8dp"
-        android:background="#0F172A">
+        android:padding="10dp"
+        android:background="#CC0F172A">
+
+        <Button
+            android:id="@+id/btnMediaClose"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:minWidth="0dp"
+            android:paddingHorizontal="12dp"
+            android:text="✕"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:backgroundTint="#334155" />
+
         <TextView
             android:id="@+id/tvMediaTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="EduTech Media3 Player"
+            android:paddingHorizontal="10dp"
+            android:text="EduTech Media Player"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
-            android:textSize="14sp" />
-        <ImageButton
+            android:textSize="13sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <Button
             android:id="@+id/btnMediaSpeed"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_ff"
-            android:contentDescription="السرعة" />
-        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:minWidth="0dp"
+            android:paddingHorizontal="10dp"
+            android:text="1.0x"
+            android:textColor="#38BDF8"
+            android:textSize="12sp"
+            android:backgroundTint="#1E293B" />
+
+        <Button
+            android:id="@+id/btnMediaResize"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:minWidth="0dp"
+            android:paddingHorizontal="9dp"
+            android:text="⛶"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:backgroundTint="#1E293B" />
+
+        <Button
+            android:id="@+id/btnMediaSleep"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:minWidth="0dp"
+            android:paddingHorizontal="9dp"
+            android:text="⏱"
+            android:textColor="#FBBF24"
+            android:textSize="13sp"
+            android:backgroundTint="#1E293B" />
+
+        <Button
+            android:id="@+id/btnMediaRotate"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:minWidth="0dp"
+            android:paddingHorizontal="9dp"
+            android:text="🔄"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:backgroundTint="#1E293B" />
+
+        <Button
+            android:id="@+id/btnMediaLock"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:minWidth="0dp"
+            android:paddingHorizontal="9dp"
+            android:text="🔓"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:backgroundTint="#1E293B" />
+
+        <Button
             android:id="@+id/btnMediaPip"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_crop"
-            android:contentDescription="نافذة مصغرة" />
-        <ImageButton
-            android:id="@+id/btnMediaClose"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:contentDescription="إغلاق" />
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:minWidth="0dp"
+            android:paddingHorizontal="9dp"
+            android:text="🪟"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:backgroundTint="#1E293B" />
     </LinearLayout>
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/eduPlayerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-</LinearLayout>
+
+    <!-- Floating Unlock Button (Visible only when Screen Locked) -->
+    <Button
+        android:id="@+id/btnUnlockFloating"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:text="🔒 فتح القفل"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:backgroundTint="#CC0284C7"
+        android:visibility="gone" />
+
+    <!-- Center HUD Pill for Brightness / Volume / Seek / ±10s -->
+    <TextView
+        android:id="@+id/tvGestureHud"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#CC0F172A"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+</FrameLayout>

@@ -2,18 +2,15 @@ package com.edutechmindset.app
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.Gravity
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Button
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 
@@ -45,37 +42,18 @@ class EduSplashActivity : AppCompatActivity() {
             webViewClient = WebViewClient()
             addJavascriptInterface(object {
                 @JavascriptInterface
+                fun skip() {
+                    runOnUiThread { enterApp() }
+                }
+
+                @JavascriptInterface
                 fun onSplashDone() {
-                    // Only enter if audio has finished (so voice is NEVER cut off)
                     if (audioCompleted) runOnUiThread { enterApp() }
                 }
             }, "EduSplashBridge")
             loadUrl("file:///android_asset/edu_cinematic_splash.html")
         }
         root.addView(wv)
-
-        val skipBtn = Button(this).apply {
-            text = "تخطي ⏭"
-            setTextColor(Color.WHITE)
-            textSize = 13f
-            isAllCaps = false
-            background = GradientDrawable().apply {
-                setColor(Color.parseColor("#880F172A"))
-                cornerRadius = 40f
-                setStroke(2, Color.parseColor("#38BDF8"))
-            }
-            setPadding(34, 14, 34, 14)
-            setOnClickListener { enterApp() }
-        }
-        root.addView(
-            skipBtn,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.BOTTOM or Gravity.END
-            ).apply { setMargins(0, 0, 36, 56) }
-        )
-
         setContentView(root)
         playFullIntroAudio()
     }
@@ -88,7 +66,7 @@ class EduSplashActivity : AppCompatActivity() {
             mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
             afd.close()
             mp.setOnPreparedListener { player ->
-                val dur = player.duration.coerceIn(3500, 28000)
+                val dur = player.duration.coerceIn(3500, 30000)
                 handler.postDelayed(fallbackRunnable, dur + 1200L)
                 player.start()
             }

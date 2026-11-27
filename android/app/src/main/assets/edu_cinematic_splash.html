@@ -107,11 +107,11 @@
     animation: loadBar 12.2s linear forwards;
   }
   .skip-btn {
-    position: fixed; top: 34px; left: 18px; z-index: 10;
-    padding: 7px 15px; border-radius: 999px;
-    background: rgba(15,23,42,0.72); border: 1px solid rgba(251,191,36,0.45);
-    color: #fde68a; font-size: 12px; font-weight: 800; backdrop-filter: blur(8px);
-    cursor: pointer;
+    position: fixed; top: 14px; left: 14px; z-index: 10;
+    padding: 3px 9px; border-radius: 999px;
+    background: rgba(15,23,42,0.48); border: 1px solid rgba(251,191,36,0.3);
+    color: rgba(253,230,138,0.82); font-size: 10px; font-weight: 700;
+    backdrop-filter: blur(6px); cursor: pointer; line-height: 1.4;
   }
   .credit {
     position: fixed; bottom: 26px; left: 0; right: 0; text-align: center;
@@ -137,7 +137,7 @@
 </head>
 <body>
 <canvas id="stars"></canvas>
-<button class="skip-btn" id="skipBtn" onclick="if(window.EduSplashBridge)window.EduSplashBridge.skip();">تخطي ⏭</button>
+<button class="skip-btn" id="skipBtn" onclick="if(window.EduSplashBridge)window.EduSplashBridge.skip();">تخطي</button>
 <div class="stage">
   <div class="logo-orbit">
     <div class="ring2"></div>
@@ -159,7 +159,7 @@
   </div>
   <div class="progress-wrap"><div class="progress-fill"></div></div>
 </div>
-<div class="credit">إشراف أ. باسل أشرف الفقعاوي • الإصدار v3.0.0</div>
+<div class="credit">إشراف أ. باسل أشرف الفقعاوي • الإصدار v3.2.0</div>
 <script>
 (function(){
   var c = document.getElementById('stars'), ctx = c.getContext('2d');

@@ -20,7 +20,8 @@ data class BookProgressRecord(
     val title: String,
     val currentPage: Int,
     val totalPages: Int,
-    val updatedAt: Long
+    val updatedAt: Long,
+    val bookmarks: Set<Int> = emptySet()
 )
 
 class EduTechDatabaseHelper(context: Context) :
@@ -101,24 +102,65 @@ class EduTechDatabaseHelper(context: Context) :
         writableDatabase.delete("saved_files", "path = ?", arrayOf(path))
     }
 
+    private fun parseBookmarks(raw: String?): Set<Int> {
+        if (raw.isNullOrBlank()) return emptySet()
+        return raw.split(",").mapNotNull { it.trim().toIntOrNull() }.toSet()
+    }
+
     fun saveBookProgress(path: String, title: String, currentPage: Int, totalPages: Int) {
+        val existingBookmarks = getBookmarks(path)
         val cv = ContentValues().apply {
             put("path", path)
             put("title", title)
             put("current_page", currentPage)
             put("total_pages", if (totalPages > 0) totalPages else 1)
+            put("bookmarks", existingBookmarks.sorted().joinToString(","))
             put("updated_at", System.currentTimeMillis())
         }
         writableDatabase.insertWithOnConflict("book_progress", null, cv, SQLiteDatabase.CONFLICT_REPLACE)
     }
 
+    fun getBookmarks(path: String): Set<Int> {
+        readableDatabase.rawQuery(
+            "SELECT bookmarks FROM book_progress WHERE path = ?",
+            arrayOf(path)
+        ).use { c ->
+            if (c.moveToFirst()) return parseBookmarks(c.getString(0))
+        }
+        return emptySet()
+    }
+
+    fun toggleBookmark(path: String, title: String, page: Int, totalPages: Int): Boolean {
+        val set = getBookmarks(path).toMutableSet()
+        val added = if (set.contains(page)) {
+            set.remove(page)
+            false
+        } else {
+            set.add(page)
+            true
+        }
+        val cv = ContentValues().apply {
+            put("path", path)
+            put("title", title)
+            put("current_page", page)
+            put("total_pages", if (totalPages > 0) totalPages else 1)
+            put("bookmarks", set.sorted().joinToString(","))
+            put("updated_at", System.currentTimeMillis())
+        }
+        writableDatabase.insertWithOnConflict("book_progress", null, cv, SQLiteDatabase.CONFLICT_REPLACE)
+        return added
+    }
+
     fun getBookProgress(path: String): BookProgressRecord? {
         readableDatabase.rawQuery(
-            "SELECT path, title, current_page, total_pages, updated_at FROM book_progress WHERE path = ?",
+            "SELECT path, title, current_page, total_pages, updated_at, bookmarks FROM book_progress WHERE path = ?",
             arrayOf(path)
         ).use { c ->
             if (c.moveToFirst()) {
-                return BookProgressRecord(c.getString(0), c.getString(1), c.getInt(2), c.getInt(3), c.getLong(4))
+                return BookProgressRecord(
+                    c.getString(0), c.getString(1), c.getInt(2), c.getInt(3), c.getLong(4),
+                    parseBookmarks(c.getString(5))
+                )
             }
         }
         return null
@@ -127,11 +169,14 @@ class EduTechDatabaseHelper(context: Context) :
     fun getAllBookProgress(): Map<String, BookProgressRecord> {
         val map = mutableMapOf<String, BookProgressRecord>()
         readableDatabase.rawQuery(
-            "SELECT path, title, current_page, total_pages, updated_at FROM book_progress ORDER BY updated_at DESC",
+            "SELECT path, title, current_page, total_pages, updated_at, bookmarks FROM book_progress ORDER BY updated_at DESC",
             null
         ).use { c ->
             while (c.moveToNext()) {
-                val rec = BookProgressRecord(c.getString(0), c.getString(1), c.getInt(2), c.getInt(3), c.getLong(4))
+                val rec = BookProgressRecord(
+                    c.getString(0), c.getString(1), c.getInt(2), c.getInt(3), c.getLong(4),
+                    parseBookmarks(c.getString(5))
+                )
                 map[rec.path] = rec
             }
         }

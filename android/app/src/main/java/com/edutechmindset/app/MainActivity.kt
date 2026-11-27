@@ -1,29 +1,46 @@
 package com.edutechmindset.app
 
 import android.Manifest
+import android.app.Dialog
 import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Message
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.OpenableColumns
 import android.provider.Settings
 import android.util.Rational
-import android.webkit.CookieManager
-import android.webkit.JavascriptInterface
+import android.view.Gravity
+import android.view.ViewGroup
+import android.view.Window
+import android.webkit.*
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.getcapacitor.BridgeActivity
+import com.getcapacitor.BridgeWebChromeClient
+import com.getcapacitor.BridgeWebViewClient
+import java.util.concurrent.Executors
 
 class MainActivity : BridgeActivity() {
     companion object {
         const val REQ_ALL_PERMS = 2801
+        private const val CHROME_MOBILE_UA =
+            "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.6478.122 Mobile Safari/537.36"
     }
+
+    private val ioExecutor = Executors.newSingleThreadExecutor()
+    private var authPopupDialog: Dialog? = null
+    private var lastBackPressedAt = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         registerPlugin(EduVaultPlugin::class.java)
@@ -43,24 +60,176 @@ class MainActivity : BridgeActivity() {
         handleIncomingIntent(intent)
     }
 
+    private fun isAllowedInAppAuthHost(host: String): Boolean {
+        val h = host.lowercase()
+        return h.endsWith("edutech-mindset.pages.dev") ||
+            h.endsWith("firebaseapp.com") ||
+            h.endsWith("accounts.google.com") ||
+            h.endsWith("google.com") ||
+            h.endsWith("googleapis.com") ||
+            h.endsWith("gstatic.com") ||
+            h.endsWith("googleusercontent.com")
+    }
+
     private fun configureWebViewForAuthAndMedia() {
         try {
             val wv = bridge?.webView ?: return
             val settings = wv.settings
+            settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.databaseEnabled = true
             settings.mediaPlaybackRequiresUserGesture = false
             settings.javaScriptCanOpenWindowsAutomatically = true
-            val ua = settings.userAgentString ?: ""
-            if (ua.contains("; wv")) {
-                settings.userAgentString = ua.replace("; wv", "")
-            }
-            settings.setSupportMultipleWindows(false)
+            settings.setSupportMultipleWindows(true)
+            settings.userAgentString = CHROME_MOBILE_UA
+
             val cm = CookieManager.getInstance()
             cm.setAcceptCookie(true)
             cm.setAcceptThirdPartyCookies(wv, true)
             wv.addJavascriptInterface(EduTechAndroidBridge(), "EduTechAndroid")
+
+            // Keep Google OAuth & Firebase Auth strictly inside the app (never launch Edge / 400 error)
+            // and inject v3.2.0 native UI/header/ads/export polish on every page load
+            wv.webViewClient = object : BridgeWebViewClient(bridge) {
+                override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                    val uri = request.url
+                    val host = uri?.host ?: ""
+                    if (isAllowedInAppAuthHost(host)) {
+                        return false
+                    }
+                    return super.shouldOverrideUrlLoading(view, request)
+                }
+
+                override fun onPageFinished(view: WebView, url: String) {
+                    super.onPageFinished(view, url)
+                    injectNativePolishScript(view)
+                }
+            }
+
+            // Support Firebase signInWithPopup inside an in-app modal WebView with shared cookies & clean Chrome UA
+            wv.webChromeClient = object : BridgeWebChromeClient(bridge) {
+                override fun onCreateWindow(
+                    view: WebView?,
+                    isDialog: Boolean,
+                    isUserGesture: Boolean,
+                    resultMsg: Message?
+                ): Boolean {
+                    val transport = resultMsg?.obj as? WebView.WebViewTransport ?: return false
+                    showInAppAuthPopup(transport, resultMsg)
+                    return true
+                }
+            }
         } catch (_: Exception) {}
+    }
+
+    private fun showInAppAuthPopup(transport: WebView.WebViewTransport, resultMsg: Message) {
+        runOnUiThread {
+            try {
+                authPopupDialog?.dismiss()
+                val dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+
+                val container = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setBackgroundColor(Color.parseColor("#0F172A"))
+                }
+
+                val topBar = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                    setBackgroundColor(Color.parseColor("#0F172A"))
+                    setPadding(24, 16, 24, 16)
+                    addView(TextView(this@MainActivity).apply {
+                        text = "🔐 تسجيل الدخول الآمن — EduTech Mindset"
+                        setTextColor(Color.WHITE)
+                        textSize = 14f
+                        layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                    })
+                    addView(Button(this@MainActivity).apply {
+                        text = "✕ إغلاق"
+                        setTextColor(Color.WHITE)
+                        setBackgroundColor(Color.parseColor("#334155"))
+                        textSize = 12f
+                        setOnClickListener { dialog.dismiss() }
+                    })
+                }
+                container.addView(topBar)
+
+                val popupWv = WebView(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    settings.databaseEnabled = true
+                    settings.javaScriptCanOpenWindowsAutomatically = true
+                    settings.setSupportMultipleWindows(true)
+                    settings.userAgentString = CHROME_MOBILE_UA
+                    val cm = CookieManager.getInstance()
+                    cm.setAcceptCookie(true)
+                    cm.setAcceptThirdPartyCookies(this, true)
+                    webViewClient = object : WebViewClient() {
+                        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                            val host = request.url?.host ?: ""
+                            if (isAllowedInAppAuthHost(host)) return false
+                            return false
+                        }
+                    }
+                    webChromeClient = object : WebChromeClient() {
+                        override fun onCloseWindow(window: WebView?) {
+                            dialog.dismiss()
+                        }
+                    }
+                }
+                container.addView(popupWv)
+
+                dialog.setContentView(container)
+                dialog.setOnDismissListener {
+                    try {
+                        popupWv.stopLoading()
+                        popupWv.destroy()
+                    } catch (_: Exception) {}
+                    authPopupDialog = null
+                }
+                authPopupDialog = dialog
+                dialog.show()
+
+                transport.webView = popupWv
+                resultMsg.sendToTarget()
+            } catch (_: Exception) {}
+        }
+    }
+
+    private fun injectNativePolishScript(view: WebView) {
+        ioExecutor.execute {
+            try {
+                val js = assets.open("public/js/v310-app-upgrade.js").bufferedReader().use { it.readText() }
+                runOnUiThread {
+                    try {
+                        view.evaluateJavascript(js, null)
+                    } catch (_: Exception) {}
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        val dlg = authPopupDialog
+        if (dlg != null && dlg.isShowing) {
+            dlg.dismiss()
+            return
+        }
+        val wv = bridge?.webView
+        if (wv != null && wv.canGoBack()) {
+            wv.goBack()
+            return
+        }
+        val now = System.currentTimeMillis()
+        if (now - lastBackPressedAt < 2000L) {
+            super.onBackPressed()
+        } else {
+            lastBackPressedAt = now
+            Toast.makeText(this, "اضغط رجوع مرة أخرى للخروج من التطبيق", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun handleIncomingIntent(intent: Intent?) {
@@ -92,19 +261,23 @@ class MainActivity : BridgeActivity() {
     }
 
     private fun importSharedUri(uri: Uri, mimeType: String) {
-        try {
-            var name = "shared_${System.currentTimeMillis()}"
-            contentResolver.query(uri, null, null, null, null)?.use { c ->
-                val idx = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (idx >= 0 && c.moveToFirst()) name = c.getString(idx) ?: name
-            }
-            val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return
-            val res = EduFileSaver.saveBytes(this, bytes, name, mimeType)
-            if (res.ok) {
-                Toast.makeText(this, "✅ تم حفظ الملف في مجلدي: ${res.displayName}", Toast.LENGTH_LONG).show()
-                EduFileSaver.openFile(this, res.filePath, res.mimeType)
-            }
-        } catch (_: Exception) {}
+        ioExecutor.execute {
+            try {
+                var name = "shared_${System.currentTimeMillis()}"
+                contentResolver.query(uri, null, null, null, null)?.use { c ->
+                    val idx = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (idx >= 0 && c.moveToFirst()) name = c.getString(idx) ?: name
+                }
+                val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return@execute
+                val res = EduFileSaver.saveBytes(this, bytes, name, mimeType)
+                runOnUiThread {
+                    if (res.ok) {
+                        Toast.makeText(this, "✅ تم حفظ الملف في مجلدي: ${res.displayName}", Toast.LENGTH_LONG).show()
+                        EduFileSaver.openFile(this, res.filePath, res.mimeType)
+                    }
+                }
+            } catch (_: Exception) {}
+        }
     }
 
     fun requestEssentialPermissions() {
@@ -131,9 +304,15 @@ class MainActivity : BridgeActivity() {
         }
     }
 
+    override fun onDestroy() {
+        authPopupDialog?.dismiss()
+        ioExecutor.shutdownNow()
+        super.onDestroy()
+    }
+
     inner class EduTechAndroidBridge {
         @JavascriptInterface
-        fun getAppVersion(): String = "3.1.1"
+        fun getAppVersion(): String = "3.2.0"
 
         @JavascriptInterface
         fun saveBase64File(base64Data: String, fileName: String, mimeType: String, subFolder: String?): String {
