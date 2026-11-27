@@ -3,9 +3,12 @@
   "appName": "EduTech Mindset",
   "webDir": "www",
   "server": {
+    "url": "https://edutech-mindset.pages.dev",
     "androidScheme": "https",
+    "cleartext": false,
     "allowNavigation": [
       "edutech-mindset.pages.dev",
+      "*.pages.dev",
       "edutech-mindset-claud.firebaseapp.com",
       "*.firebaseapp.com",
       "accounts.google.com",

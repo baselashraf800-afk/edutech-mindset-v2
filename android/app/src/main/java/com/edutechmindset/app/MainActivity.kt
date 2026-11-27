@@ -55,9 +55,7 @@ class MainActivity : BridgeActivity() {
             if (ua.contains("; wv")) {
                 settings.userAgentString = ua.replace("; wv", "")
             }
-            if (!settings.userAgentString.contains("EduTechMindsetApp")) {
-                settings.userAgentString = "${settings.userAgentString} EduTechMindsetApp/3.1.0"
-            }
+            settings.setSupportMultipleWindows(false)
             val cm = CookieManager.getInstance()
             cm.setAcceptCookie(true)
             cm.setAcceptThirdPartyCookies(wv, true)
@@ -135,7 +133,7 @@ class MainActivity : BridgeActivity() {
 
     inner class EduTechAndroidBridge {
         @JavascriptInterface
-        fun getAppVersion(): String = "3.1.0"
+        fun getAppVersion(): String = "3.1.1"
 
         @JavascriptInterface
         fun saveBase64File(base64Data: String, fileName: String, mimeType: String, subFolder: String?): String {

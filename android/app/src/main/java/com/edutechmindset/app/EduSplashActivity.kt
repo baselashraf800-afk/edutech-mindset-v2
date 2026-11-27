@@ -9,6 +9,10 @@ import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
 import android.view.ViewGroup
+import android.webkit.JavascriptInterface
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -16,37 +20,63 @@ import androidx.appcompat.app.AppCompatActivity
 class EduSplashActivity : AppCompatActivity() {
     private var mediaPlayer: MediaPlayer? = null
     private var entered = false
+    private var audioCompleted = false
     private val handler = Handler(Looper.getMainLooper())
     private val fallbackRunnable = Runnable { enterApp() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edu_splash)
 
-        // Add sleek Skip button so the user can enter early if desired, while full audio plays by default
-        val root = findViewById<ViewGroup>(android.R.id.content)
+        val root = FrameLayout(this).apply {
+            setBackgroundColor(Color.parseColor("#020617"))
+        }
+
+        val wv = WebView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            setBackgroundColor(Color.parseColor("#020617"))
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            settings.allowFileAccess = true
+            settings.mediaPlaybackRequiresUserGesture = false
+            settings.cacheMode = WebSettings.LOAD_NO_CACHE
+            webViewClient = WebViewClient()
+            addJavascriptInterface(object {
+                @JavascriptInterface
+                fun onSplashDone() {
+                    // Only enter if audio has finished (so voice is NEVER cut off)
+                    if (audioCompleted) runOnUiThread { enterApp() }
+                }
+            }, "EduSplashBridge")
+            loadUrl("file:///android_asset/edu_cinematic_splash.html")
+        }
+        root.addView(wv)
+
         val skipBtn = Button(this).apply {
             text = "تخطي ⏭"
             setTextColor(Color.WHITE)
             textSize = 13f
             isAllCaps = false
             background = GradientDrawable().apply {
-                setColor(Color.parseColor("#660F172A"))
+                setColor(Color.parseColor("#880F172A"))
                 cornerRadius = 40f
                 setStroke(2, Color.parseColor("#38BDF8"))
             }
             setPadding(34, 14, 34, 14)
             setOnClickListener { enterApp() }
         }
-        val lp = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            Gravity.BOTTOM or Gravity.END
-        ).apply {
-            setMargins(0, 0, 36, 56)
-        }
-        root.addView(skipBtn, lp)
+        root.addView(
+            skipBtn,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM or Gravity.END
+            ).apply { setMargins(0, 0, 36, 56) }
+        )
 
+        setContentView(root)
         playFullIntroAudio()
     }
 
@@ -58,20 +88,23 @@ class EduSplashActivity : AppCompatActivity() {
             mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
             afd.close()
             mp.setOnPreparedListener { player ->
-                val dur = player.duration.coerceIn(2500, 22000)
-                handler.postDelayed(fallbackRunnable, dur + 700L)
+                val dur = player.duration.coerceIn(3500, 28000)
+                handler.postDelayed(fallbackRunnable, dur + 1200L)
                 player.start()
             }
             mp.setOnCompletionListener {
-                handler.postDelayed({ enterApp() }, 350L)
+                audioCompleted = true
+                handler.postDelayed({ enterApp() }, 600L)
             }
             mp.setOnErrorListener { _, _, _ ->
-                handler.postDelayed(fallbackRunnable, 1800L)
+                audioCompleted = true
+                handler.postDelayed(fallbackRunnable, 4000L)
                 true
             }
             mp.prepareAsync()
         } catch (_: Exception) {
-            handler.postDelayed(fallbackRunnable, 1800L)
+            audioCompleted = true
+            handler.postDelayed(fallbackRunnable, 4000L)
         }
     }
 
