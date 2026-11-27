@@ -1,0 +1,116 @@
+{
+  "id": "/",
+  "name": "EduTech Mindset | عقلية التعليم والتكنولوجيا",
+  "short_name": "EduTech",
+  "description": "منصة EduTech Mindset بإشراف الأستاذ باسل الفقعاوي من غزة — أكثر من 35 أداة ذكاء اصطناعي وتكنولوجيا تعليم، كتب ومناهج، أوراق عمل، سبورة ذكية، ومختبرات تفاعلية للمعلمين والطلبة.",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "fullscreen"
+  ],
+  "background_color": "#051322",
+  "theme_color": "#0284c7",
+  "orientation": "any",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": [
+    "education",
+    "productivity",
+    "books",
+    "utilities"
+  ],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/feature-graphic.png",
+      "sizes": "1024x500",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "منصة EduTech Mindset — مركز التطبيقات التعليمية الذكية"
+    },
+    {
+      "src": "assets/screenshot-narrow.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "أدوات المعلم والطالب والذكاء الاصطناعي"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "المراحل الدراسية والدروس",
+      "short_name": "الدروس",
+      "description": "فيديوهات وملخصات وأوراق عمل لكل صف ومادة",
+      "url": "./index.html?app=learnSection",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "مولّد أوراق العمل والاختبارات",
+      "short_name": "أوراق العمل",
+      "description": "توليد أوراق عمل واختبارات بالذكاء الاصطناعي",
+      "url": "./index.html?app=worksheetStudio",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "بوابة التوجيهي وحاسبة المعدل",
+      "short_name": "التوجيهي",
+      "description": "حاسبة معدل التوجيهي وجدول المراجعة والمستشار الجامعي",
+      "url": "./index.html?app=tawjihiStudio",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "السبورة التفاعلية الذكية",
+      "short_name": "السبورة",
+      "description": "سبورة شرح تفاعلية مع تسجيل فيديو وحل بالذكاء الاصطناعي",
+      "url": "./index.html?app=whiteboardStudio",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

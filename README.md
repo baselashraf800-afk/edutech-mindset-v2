@@ -1,17 +1,14 @@
-# EduTech Mindset | عقلية التعليم والتكنولوجيا — Android v3.1.0 Pro
+# EduTech Mindset | عقلية التعليم والتكنولوجيا — Official Capacitor Android App (`v3.0.0`)
 
-تطبيق **EduTech Mindset (عقلية التعليم والتكنولوجيا)** الرسمي للأندرويد بإدارة **الأستاذ باسل أشرف الفقعاوي** (`com.edutechmindset.app`) — الإصدار `v3.1.0` (`versionCode 310`).
+المستودع الرسمي الموحّد لتطبيق **EduTech Mindset** للأندرويد (`com.edutechmindset.app`) المبني بإطار **Capacitor + Kotlin** مع دمج حزمة المنصة أوفلاين (`v3.3.0`).
 
-## أبرز مميزات الإصدار v3.1.0 Pro
-- 📖 **قارئ الكتب التفاعلي (`MoonBookReaderActivity`)**: قراءة مريحة للكتب والملفات مع حفظ التقدم وتخصيص العرض.
-- 📁 **مدير الملفات ومجلد التطبيق (`FileManagerPlusActivity` و`MyFolderActivity`)**: تنظيم وعرض وإدارة ملفات الدراسة والكتب المحفوظة بسهولة.
-- 🎬 **مشغّل الوسائط المتقدم (`MxMediaPlayerActivity`)**: تشغيل الفيديوهات والصوتيات التعليمية بسلاسة مع دعم وضع صورة في صورة (PiP) والتكبير.
-- ✏️ **السبورة الذكية (`SmartWhiteboardActivity`)**: سبورة تفاعلية مدمجة للرسم والشرح وحل المسائل.
-- 🎛️ **لوحة المساعد التعليمي الذكية (`EduTechHubSheet`)**: وصول سريع للأدوات التعليمية والتركيز والمكتبة.
-- 🧮 **أدوات الدراسة العائمة (`StudyToolsOverlay`)**: الحاسبة العلمية، مؤقت التركيز (Pomodoro)، والفقاعة العائمة فوق التطبيقات (`OverlayAssistantService`).
-- 🔙 **نظام الرجوع الذكي (`BackStackManager`)**: إغلاق تدريجي للنوافذ والأدوات العائمة دون فقدان تقدم الدراسة.
-- 🧩 **ودجت الشاشة الرئيسية (`EduTechWidgetProvider`)** و**منبه المذاكرة اليومي (`StudyReminderReceiver`)** وقاعدة البيانات المحلية (`EduTechDatabaseHelper`).
+## أبرز المكونات الأصلية (Kotlin / Android)
+- 🚀 **شاشة البداية (`EduSplashActivity`)** مع رسوميات Lottie.
+- 🎬 **مشغّل الوسائط المتقدم (`EduMediaPlayerActivity` + `EduMediaPlayerPlugin`)** بمحرك ExoPlayer Media3 ودعم وضع صورة في صورة (PiP).
+- 📖 **قارئ الكتب PDF (`EduPdfReaderPlugin`)** وخزنة الملفات المحلية (`EduVaultPlugin`).
+- 🧩 **ودجت الجدول الدراسي (`EduScheduleWidgetProvider`)** وإضافات الأمان (`EduSecurityWidgetPlugin`).
+- 🌐 **تحديث حزمة الويب الأوفلاين (`www/`)** إلى أحدث إصدار من المنصة (`v3.3.0`).
 
 ## الروابط
 - 🌐 **المنصة الرسمية:** [edutech-mindset.pages.dev](https://edutech-mindset.pages.dev)
-- 📦 **أحدث الإصدارات (APK):** [GitHub Releases](https://github.com/baselashraf800-afk/edutech-mindset-v2/releases)
+- 📦 **تحميل التطبيق (APK):** [GitHub Releases](https://github.com/baselashraf800-afk/edutech-mindset-v2/releases/tag/v3.0.0)

@@ -1,0 +1,9 @@
+{
+  "name": "edutech-tailwind-build",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -c tailwind.config.js -i input.css -o ../../css/tailwind.css --minify",
+    "apply": "node apply.js"
+  },
+  "devDependencies": { "tailwindcss": "3.4.17" }
+}

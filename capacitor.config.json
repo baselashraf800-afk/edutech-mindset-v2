@@ -1,0 +1,28 @@
+{
+  "appId": "com.edutechmindset.app",
+  "appName": "EduTech Mindset",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "allowNavigation": [
+      "edutech-mindset.pages.dev",
+      "edutech-mindset-claud.firebaseapp.com",
+      "*.firebaseapp.com",
+      "accounts.google.com",
+      "*.google.com",
+      "*.googleapis.com",
+      "*.gstatic.com"
+    ]
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "backgroundColor": "#020617",
+      "showSpinner": false
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_launcher",
+      "iconColor": "#0284C7"
+    }
+  }
+}

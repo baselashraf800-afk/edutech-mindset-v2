@@ -1,0 +1,93 @@
+/* EduTech Mindset v156 — Direct Styling for #eduOrganizedPlatformRoot & Clean Mobile UX */
+:root {
+  --edu-bg: #f0f6fc;
+  --edu-surface: #ffffff;
+  --edu-surface-glass: rgba(255, 255, 255, 0.9);
+  --edu-border: rgba(2, 132, 199, 0.18);
+  --edu-brand: #0284c7;
+  --edu-ink: #0f172a;
+  --edu-muted: #475569;
+  --edu-shadow: 0 14px 34px -10px rgba(2, 132, 199, 0.12);
+}
+
+html.dark {
+  --edu-bg: #040914;
+  --edu-surface: #0b1324;
+  --edu-surface-glass: rgba(11, 19, 36, 0.88);
+  --edu-border: rgba(56, 189, 248, 0.2);
+  --edu-ink: #f1f5f9;
+  --edu-muted: #94a3b8;
+  --edu-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.65);
+}
+
+body {
+  background-color: var(--edu-bg) !important;
+  color: var(--edu-ink);
+}
+
+/* الشريط العلوي الزجاجي */
+#siteTopHeader {
+  background: var(--edu-surface-glass) !important;
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid var(--edu-border) !important;
+  box-shadow: 0 6px 24px -8px rgba(2, 132, 199, 0.12);
+}
+
+/* البوابة المبوّبة الرئيسية (#eduOrganizedPlatformRoot) */
+#eduOrganizedPlatformRoot > div > div {
+  border-radius: 1.75rem !important;
+  border: 1px solid var(--edu-border) !important;
+  box-shadow: var(--edu-shadow) !important;
+}
+
+.edu-v156-portal-header {
+  background: linear-gradient(135deg, #0c4a6e 0%, #0f172a 55%, #1e1b4b 100%) !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25) !important;
+}
+
+#eduOrganizedPlatformRoot [data-org-topnav] {
+  border-radius: 1rem !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease !important;
+}
+
+#eduOrganizedPlatformRoot [data-org-topnav]:hover {
+  transform: translateY(-2px);
+}
+
+/* تنسيق صناديق المراحل والصفوف والمواد داخل البوابة */
+#orgStepStagesBox,
+#orgStepGradesBox,
+#orgStepSubjectsBox {
+  border-radius: 1.35rem !important;
+  box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.06);
+}
+
+#orgBookPagePaper {
+  border-radius: 1.5rem !important;
+  box-shadow: 0 16px 38px -12px rgba(15, 23, 42, 0.12);
+}
+
+/* البطاقات العامة وشريط الجوال */
+.glass-card,
+#resourceGrid > *,
+#socialGrid > * {
+  border-radius: 1.25rem;
+  border-color: var(--edu-border);
+  box-shadow: var(--edu-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#floatingBar {
+  background: var(--edu-surface-glass);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--edu-border);
+  border-radius: 1.25rem;
+  padding: 0.35rem;
+}
+
+#mobileBottomNav {
+  background: var(--edu-surface-glass) !important;
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--edu-border) !important;
+}

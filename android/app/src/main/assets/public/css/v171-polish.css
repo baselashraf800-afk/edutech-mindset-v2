@@ -1,0 +1,383 @@
+/* EduTech Mindset v172 (مبنية على النسخة 153/163 الأصلية + الخيارات الثلاثة بأمان تام) */
+@media (max-width: 768px) {
+  body { overflow-x: clip; }
+
+  /* الخيار 1: ترتيب الهيدر العلوي وإخفاء القوائم والأزرار المكررة فقط (دون حذف DOM) */
+  #siteTopHeader {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 60 !important;
+  }
+  #tkBar {
+    position: relative !important;
+    top: auto !important;
+  }
+  #headerQuickNavStrip,
+  #eaHdrBtn,
+  #gsHdrBtn,
+  #btnHeaderRegister { display: none !important; }
+  #themeIcon { display: inline-block !important; font-style: normal; }
+  #siteTopHeader a[href="#hero"],
+  #siteTopHeader .brand-title-wrap {
+    min-width: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* منع تداخل الأيقونات العائمة مع الشريط السفلي (بقاء المساعد الذكي ظاهراً مثل 153) */
+  #eduAsstOrb { /* v245: draggable */ /* v245: draggable */ display: flex !important; }
+  #floatDock { bottom: 78px !important; right: 10px !important; }
+  #exFab { bottom: 142px !important; right: 12px !important; }
+}
+
+/* الخيار 3: إبراز الصور والفيديوهات في المقدمة وقسم من نحن وحسابات التواصل بوضوح تام */
+#homeAds:not(.hidden), #homeVideos:not(.hidden), #coursesSection {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  margin-top: 12px !important;
+}
+#social, #about {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  padding-bottom: 84px !important;
+}
+
+/* وضع توفير البيانات v174 */
+body.edu-data-saver img:not([alt*="EduTech"]):not(#homeAds img) { display: none !important; }
+body.edu-data-saver .hero-glow { background-image: none !important; }
+
+/* v175: إخفاء زر الإدارة تماماً عن الزوار والطلاب وإظهاره للمشرف العام فقط */
+#btnV172UnifiedAdmin {
+  display: none !important;
+}
+body.is-super-admin #btnV172UnifiedAdmin {
+  display: inline-flex !important;
+}
+
+/* v178: منع تغطية زر كل الأدوات العائم للبطاقات وضبط أزرار الهيدر */
+#exFab { display: none !important; }
+#toast { top: auto !important; bottom: 80px !important; }
+
+/* v179: إخفاء الشريط العلوي المكرر على الهواتف والأجهزة اللوحية بالكامل ومنع تجميد الواجهة */
+@media (max-width: 1024px) {
+  #headerQuickNavStrip { display: none !important; }
+}
+
+/* v183: التمرير الأفقي للفيديوهات + توحيد حواف وتباين البطاقات */
+@media (max-width: 768px) {
+  #homeVideos .grid,
+  #homeVideos > div > div {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 10px !important;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+  #homeVideos .grid > *,
+  #homeVideos > div > div > * {
+    min-width: 235px !important;
+    max-width: 260px !important;
+    flex-shrink: 0 !important;
+    scroll-snap-align: start;
+  }
+}
+
+.glass-card,
+#eduOrganizedPlatformRoot .rounded-3xl {
+  border-radius: 18px !important;
+}
+html.dark #v183Quick3Bar button {
+  background: #131c31 !important;
+  color: #f8fafc !important;
+  border-color: #1e293b !important;
+}
+
+/* v185: توحيد وتكبير واجهات الأدوات والنوافذ من الداخل للهاتف */
+@media (max-width: 768px) {
+  #modal input, #modal select, #modal textarea,
+  #eduOrganizedPlatformRoot input, #eduOrganizedPlatformRoot select {
+    min-height: 40px !important;
+    font-size: 13px !important;
+  }
+  #modal button, #eduOrganizedPlatformRoot button {
+    font-size: 12px !important;
+  }
+}
+
+/* v189: تنسيق وتجميل القوائم السفلية بطريقة إبداعية ومتوافقة مع تطبيق APK */
+html { scroll-behavior: smooth; }
+#mobileBottomNav {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-top: 1.5px solid #e2e8f0 !important;
+  border-top-left-radius: 22px !important;
+  border-top-right-radius: 22px !important;
+  box-shadow: 0 -8px 26px rgba(15, 23, 42, 0.09) !important;
+  padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+}
+html.dark #mobileBottomNav {
+  background: rgba(15, 23, 42, 0.97) !important;
+  border-top-color: #1e293b !important;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45) !important;
+}
+#mobileBottomNav button {
+  border-radius: 14px !important;
+  transition: transform 0.16s ease, background-color 0.16s ease !important;
+}
+#mobileBottomNav button:active {
+  transform: scale(0.92) !important;
+}
+
+/* v190: إخفاء المربع الرمادي الصغير الغامض على اليمين وتثبيت توازن الشريط السفلي */
+#floatDock, #dkTog, #btnMobileTabMusic { display: none !important; }
+#mobileBottomNav { justify-content: space-around !important; }
+
+/* ============================================================
+   v218: إصلاح تداخل الطبقات، توحيد الرئيسية المفتوحة، وتحسين نوافذ الإدارة
+   ============================================================ */
+/* إخفاء زر المساعد الذكي العائم تلقائياً عند فتح أي نافذة منبثقة لمنع تغطية الحقول */
+html.modal-open #eduAsstOrb,
+body.edu-any-modal-open #eduAsstOrb {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+#eduAsstOrb {
+  z-index: 45 !important;
+}
+#modalContainer {
+  z-index: 99990 !important;
+}
+#toast {
+  z-index: 99999 !important;
+}
+/* عند فتح نافذة منبثقة، يظهر الإشعار في الأعلى حتى لا يغطي أزرار وحقول النموذج السفلية */
+html.modal-open #toast,
+body.edu-any-modal-open #toast {
+  top: 14px !important;
+  bottom: auto !important;
+}
+
+/* ضمان ظهور الأقسام الرئيسية في وضع الصفحة الرئيسية المفتوحة */
+/* v222: منع تكرار شبكة الأدوات القديمة تحت البوابة الموحّدة — يظهر القسم القديم فقط عند فتح حسابي/حقيبتي/الجامعة/الإدارة */
+body:not(.edu-show-legacy-org) #eduOrganizedPlatformRoot {
+  display: none !important;
+}
+body.edu-show-legacy-org #eduOrganizedPlatformRoot {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+#coursesSection {
+  scroll-margin-top: 84px;
+}
+#homeVideos {
+  scroll-margin-top: 84px;
+}
+
+/* تحسين استجابة نافذة مركز التطوير والإعلانات على الجوال */
+@media (max-width: 768px) {
+  #modalBox {
+    max-height: 92dvh !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+  #haBody input, #haBody textarea, #haBody select {
+    max-width: 100% !important;
+  }
+  #adU {
+    width: 100% !important;
+    flex: 1 1 160px !important;
+  }
+  main {
+    padding-bottom: 84px;
+  }
+}
+
+/* v219: بوابة المراحل والكتب والمناهج الموحّدة */
+#unifiedCurriculumHub { display: block !important; opacity: 1 !important; visibility: visible !important; scroll-margin-top: 84px; }
+
+/* ============================================================
+   v220: إزالة تداخل الأزرار العائمة مع الشريط السفلي وضغط شريط الإدارة العلوي
+   ============================================================ */
+/* إخفاء زر EduTech الدائري المكرر أسفل اليمين لمنع تغطية زر الرئيسية */
+#eduFloatingLauncher {
+  display: none !important;
+}
+@media (max-width: 768px) {
+  /* رفع أيقونة المساعد الذكي فوق الشريط السفلي بمسافة مريحة وتصغيرها قليلاً */
+  #eduAsstOrb {
+    /* v245: draggable */
+    /* v245: draggable */
+    width: 48px !important;
+    height: 48px !important;
+  }
+  /* منع شريط الإدارة العلوي من تغطية ربع شاشة الجوال أو التداخل مع شريط الهاتف */
+  #eduSovereignAdminBar {
+    padding: 6px 8px !important;
+    gap: 4px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+  }
+  #eduSovereignAdminBar > * {
+    flex-shrink: 0 !important;
+    font-size: 11px !important;
+    padding: 5px 10px !important;
+  }
+}
+
+/* v221: بوابة الأدوات المنظمة وإخفاء شريط التثبيت عند فتح النوافذ */
+#unifiedToolsHub { display: block !important; opacity: 1 !important; visibility: visible !important; scroll-margin-top: 84px; }
+html.modal-open #eduPwaInstallBar, body.edu-any-modal-open #eduPwaInstallBar { display: none !important; }
+
+/* v231: إصلاح طبقات المساعد مقابل النوافذ + تباين زر الأدوات السفلي + تحسين حقل الكتابة */
+#eduAsst { z-index: 99980 !important; }
+#modalContainer { z-index: 99990 !important; }
+#toast { z-index: 99999 !important; }
+#mobileBottomNav [data-mob-tab="tools"],
+#mobileBottomNav [data-mob-tab="tools"] span {
+  color: #020617 !important;
+}
+@media (max-width: 768px) {
+  #eaTxt {
+    min-width: 115px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* v232: إبراز المراحل الأصلية #learnSection + تنظيف الهيدر على الجوال + تسريع التمرير */
+#learnSection {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  scroll-margin-top: 84px;
+}
+@media (max-width: 768px) {
+  /* منع قص اسم الموقع أو ازدحام أزرار الهيدر على الشاشات الضيقة */
+  #siteTopHeader .header-main-row {
+    gap: 4px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+  #siteTopHeader button {
+    padding: 5px 6px !important;
+  }
+  #eduDataSaverBtn { display: none !important; }
+  /* تخفيف ضغط الرسوميات لتسريع التمرير على الجوال */
+  .glass-nav, .glass-card, #mobileBottomNav {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  #eduAsstOrb::after {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   v233: حملة إلغاء التكرار الكبرى — واجهة صافية من 6 أقسام فقط
+   ============================================================ */
+/* 1. توحيد الإدارة في زر واحد فقط بالهيدر (#btnV172UnifiedAdmin) وإخفاء الـ 3 أماكن المكررة */
+#eduSovereignAdminBar,
+body.is-super-admin #eduSovereignAdminBar,
+#mobAdminTabBtn,
+body.is-super-admin #mobAdminTabBtn,
+#adminDevFooterHub,
+body.is-super-admin #adminDevFooterHub {
+  display: none !important;
+}
+
+/* 2. إلغاء الشريط الثابت المكرر وإعلانات المكتبة المكررة تحت السلايدر */
+#announcementBanner,
+#adSlotTop,
+#adSlotMid,
+#adSlotBot,
+[data-ad-slot] {
+  display: none !important;
+}
+
+/* 3. إلغاء شريط الاختصارات الـ 4 المكرر فوق بطاقة الترحيب الموحدة */
+#v194HeroQuickBar {
+  display: none !important;
+}
+
+/* 4. ترتيب المسافات النظيفة بين الأقسام الـ 6 الرئيسية */
+#hero {
+  padding-top: 1.25rem !important;
+  padding-bottom: 1.5rem !important;
+}
+#learnSection, #coursesSection, #unifiedToolsHub, #homeVideos {
+  margin-top: 14px !important;
+  margin-bottom: 14px !important;
+}
+
+/* v234: وضع ملء الشاشة لقارئ الكتب المدرسي الطبيعي */
+#bookReaderStudio.edu-reader-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99985 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 12px !important;
+  overflow-y: auto !important;
+  background: #0f172a !important;
+}
+
+/* v235: إخفاء قسم الكتب المكرر (#booksSection) وبقايا الموسيقى والبدء السريع لتخفيف الواجهة */
+#booksSection,
+#musicMiniPlayer,
+#quickStart {
+  display: none !important;
+}
+
+/* v236: إلغاء شاشة قارئ الكتب المنفصلة المزدحمة + وضع ملء الشاشة للكتاب المدمج داخل المراحل */
+#bookReaderStudio {
+  display: none !important;
+}
+#v234InlinePdfStage.edu-inline-pdf-fs {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99988 !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+#v234InlinePdfStage.edu-inline-pdf-fs iframe {
+  flex: 1 !important;
+  height: auto !important;
+}
+
+/* ============================================================
+   v240: توحيد خانة الإدارة بالكامل في مكان واحد أسفل الموقع (#adminDevFooterHub)
+   ============================================================ */
+/* إخفاء زر الإدارة من الهيدر ومن الشريط السفلي ومن الشريط العلوي لتبقى الواجهة العلوية صافية 100% */
+#btnV172UnifiedAdmin,
+body.is-super-admin #btnV172UnifiedAdmin,
+#eduSovereignAdminBar,
+body.is-super-admin #eduSovereignAdminBar,
+#mobAdminTabBtn,
+body.is-super-admin #mobAdminTabBtn {
+  display: none !important;
+}
+/* إظهار مركز القيادة والإدارة الموحّد أسفل الموقع للإدارة العليا فقط */
+body:not(.is-super-admin) #adminDevFooterHub {
+  display: none !important;
+}
+body.is-super-admin #adminDevFooterHub {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  padding: 0 12px !important;
+}
+
+/* v241: إخفاء جميع أزرار الإدارة المكررة في الهيدر والقائمة العلوية وحصر الإدارة في المركز الموحّد أسفل الموقع فقط */
+#btnV172UnifiedAdmin, #navAdminTopBtn, [data-top-nav="admin"], #eduSovereignAdminBar, #mobAdminTabBtn {
+  display: none !important;
+  visibility: hidden !important;
+}

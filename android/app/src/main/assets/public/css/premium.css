@@ -1,0 +1,388 @@
+/* ============================================================
+   EduTech Mindset — طبقة التصميم المتقدّم (v1)
+   تُحمَّل بعد أنماط الصفحة لتصقل المظهر دون المساس بالبنية.
+   ============================================================ */
+:root {
+  --ex-brand: var(--brand-500, #0284c7);
+  --ex-brand-d: var(--brand-800, #0c4a6e);
+  --ex-gold: #f59e0b;
+  --ex-ink: #0f172a;
+  --ex-line: #dbe4ee;
+  --ex-soft: var(--brand-50, #f1f7fc);
+  --ex-radius: var(--site-radius, 14px);
+}
+
+/* ---------- لمسات عامة ---------- */
+::selection { background: rgba(2, 132, 199, .22); }
+html { scroll-behavior: smooth; }
+:focus-visible { outline: 2px solid var(--ex-brand); outline-offset: 2px; border-radius: 10px; }
+button:not(:disabled), [role="button"], a.btn { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled):active { transform: translateY(1px) scale(.985); }
+.glass-card { box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 10px 30px -14px rgba(8, 47, 73, .28); }
+.dark .glass-card { box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 12px 34px -14px rgba(0, 0, 0, .7); }
+section[id] { scroll-margin-top: 74px; }
+section > div > h2, section h2.font-black { letter-spacing: -.2px; }
+* { scrollbar-width: thin; scrollbar-color: rgba(2,132,199,.45) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: rgba(2,132,199,.4); border-radius: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+textarea, input, select { transition: box-shadow .18s ease, border-color .18s ease; }
+textarea:focus, input:focus, select:focus { box-shadow: 0 0 0 3px rgba(2, 132, 199, .18); }
+
+/* ---------- شريط التنزيل (Word / PDF) ---------- */
+.ex-bar { display: inline-flex; flex-wrap: wrap; gap: .45rem; align-items: center; vertical-align: middle; }
+.contents { display: contents; }
+.ex-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  padding: .5rem .9rem; border-radius: 12px; font-size: 11.5px; font-weight: 800; line-height: 1.2;
+  color: #fff; border: 0; cursor: pointer; white-space: nowrap;
+  box-shadow: 0 6px 14px -8px rgba(15, 23, 42, .55), inset 0 1px 0 rgba(255,255,255,.22);
+  transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+}
+.ex-btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 10px 20px -10px rgba(15, 23, 42, .6), inset 0 1px 0 rgba(255,255,255,.25); }
+.ex-btn:disabled { opacity: .7; cursor: progress; }
+.ex-btn i { font-size: 13px; }
+.ex-w { background: linear-gradient(135deg, #2563eb, #0284c7); }
+.ex-p { background: linear-gradient(135deg, #e11d48, #f43f5e); }
+.ex-c { background: linear-gradient(135deg, #475569, #64748b); }
+.ex-s { background: linear-gradient(135deg, #059669, #10b981); }
+.ex-d { background: rgba(244, 63, 94, .1); color: #e11d48; box-shadow: none; }
+.ex-d:hover:not(:disabled) { background: #e11d48; color: #fff; }
+.ex-bar + .ex-bar { margin-inline-start: .45rem; }
+
+/* ---------- عرض النتائج منسّقة ---------- */
+.ex-rich { line-height: 2; font-size: 13px; color: var(--ex-ink); text-align: right; overflow-wrap: anywhere; }
+.dark .ex-rich { color: #e2e8f0; }
+.ex-rich > :first-child { margin-top: 0; }
+.ex-rich h3, .ex-rich h4, .ex-rich h5 { font-weight: 900; color: var(--ex-brand-d); margin: 1.1rem 0 .35rem; line-height: 1.5; }
+.dark .ex-rich h3, .dark .ex-rich h4, .dark .ex-rich h5 { color: #7dd3fc; }
+.ex-rich h3 { font-size: 1.12rem; padding-bottom: .3rem; border-bottom: 2px solid transparent; border-image: linear-gradient(to left, var(--ex-gold) 0 56px, var(--ex-line) 56px) 1; }
+.ex-rich h4 { font-size: 1rem; color: var(--ex-brand); }
+.ex-rich h5 { font-size: .92rem; }
+.ex-rich p { margin: .3rem 0; }
+.ex-rich strong { font-weight: 800; color: var(--ex-brand-d); }
+.dark .ex-rich strong { color: #bae6fd; }
+.ex-rich ul, .ex-rich ol { margin: .35rem 0; padding-inline-start: 1.5rem; }
+.ex-rich ul { list-style: none; }
+.ex-rich ul > li { position: relative; margin: .2rem 0; }
+.ex-rich ul > li::before { content: ""; position: absolute; inset-inline-start: -1.05rem; top: .85em; width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg, var(--ex-brand), #38bdf8); }
+.ex-rich ol { list-style: decimal; }
+.ex-rich ol > li::marker { color: var(--ex-brand); font-weight: 800; }
+.ex-rich li.l1 { margin-inline-start: 1.1rem; } .ex-rich li.l2 { margin-inline-start: 2.2rem; }
+.ex-rich blockquote { margin: .6rem 0; padding: .55rem .9rem; background: #fffbeb; border-inline-start: 4px solid var(--ex-gold); border-radius: 10px; color: #78350f; }
+.dark .ex-rich blockquote { background: rgba(245, 158, 11, .1); color: #fcd34d; }
+.ex-rich hr { border: 0; height: 1px; background: linear-gradient(to left, transparent, var(--ex-line), transparent); margin: .9rem 0; }
+.ex-tbl { overflow-x: auto; margin: .7rem 0; border-radius: 12px; border: 1px solid var(--ex-line); }
+.dark .ex-tbl { border-color: #334155; }
+.ex-tbl table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 320px; }
+.ex-tbl th { background: linear-gradient(to left, #e0f2fe, #f0f9ff); color: var(--ex-brand-d); font-weight: 900; text-align: right; padding: .55rem .7rem; border-bottom: 2px solid #bae6fd; }
+.ex-tbl td { padding: .5rem .7rem; border-top: 1px solid var(--ex-line); vertical-align: top; }
+.ex-tbl tr:nth-child(even) td { background: rgba(241, 247, 252, .7); }
+.dark .ex-tbl th { background: rgba(2, 132, 199, .2); color: #bae6fd; border-bottom-color: #0369a1; }
+.dark .ex-tbl td { border-top-color: #334155; }
+.dark .ex-tbl tr:nth-child(even) td { background: rgba(255, 255, 255, .03); }
+
+/* ---------- زر «أعمالي» العائم ---------- */
+#exFab {
+  position: fixed; z-index: 35; bottom: 9.2rem;
+  left: max(.85rem, calc(50% - 215px + .85rem));
+  width: 52px; height: 52px; border-radius: 18px; border: 0; cursor: pointer; color: #fff; font-size: 19px;
+  background: linear-gradient(135deg, #0369a1, #0ea5e9 55%, #22d3ee);
+  box-shadow: 0 14px 28px -10px rgba(2, 132, 199, .75), inset 0 1px 0 rgba(255,255,255,.35);
+  display: flex; align-items: center; justify-content: center; transition: transform .2s ease;
+}
+#exFab:hover { transform: translateY(-3px) rotate(-4deg); }
+#exFab .ex-count {
+  position: absolute; top: -6px; right: -6px; min-width: 21px; height: 21px; padding: 0 5px; border-radius: 11px;
+  background: var(--ex-gold); color: #111827; font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center;
+  border: 2px solid #fff;
+}
+.dark #exFab .ex-count { border-color: #0b2138; }
+
+/* ---------- بطاقات «أعمالي» ---------- */
+.ex-work { border: 1px solid var(--ex-line); border-radius: var(--ex-radius); padding: .9rem; background: linear-gradient(to bottom, #fff, var(--ex-soft)); box-shadow: 0 8px 20px -16px rgba(8, 47, 73, .6); }
+.dark .ex-work { background: linear-gradient(to bottom, rgba(255,255,255,.04), rgba(255,255,255,.02)); border-color: #334155; }
+.ex-work-t { font-weight: 900; font-size: 13px; color: var(--ex-brand-d); line-height: 1.6; }
+.dark .ex-work-t { color: #bae6fd; }
+.ex-work-m { font-size: 10px; font-weight: 700; color: #94a3b8; margin: .1rem 0 .4rem; }
+.ex-work-p { font-size: 11px; color: #64748b; line-height: 1.8; margin-bottom: .65rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ex-empty { text-align: center; padding: 2.5rem 1rem; color: #64748b; }
+.ex-empty i { font-size: 2.6rem; color: #7dd3fc; margin-bottom: .6rem; }
+.ex-empty p { font-weight: 900; font-size: 14px; }
+.ex-empty small { display: block; font-size: 11px; line-height: 1.9; margin-top: .3rem; }
+
+/* ---------- الطباعة: إخفاء عناصر الواجهة ---------- */
+@media print {
+  #exFab, .ex-bar, #mobileBottomNav, #musicMiniPlayer { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .ex-btn, #exFab { transition: none; }
+}
+
+/* ---------- تحسينات العرض المكتبي والشاشات الكبيرة (Desktop Mode Polish) ---------- */
+@media (min-width: 1024px) {
+  #mobileBottomNav {
+    display: none !important;
+  }
+}
+body:not(.mobile-app-mode) #mobileBottomNav {
+  display: none !important;
+}
+body:not(.mobile-app-mode) #musicMiniPlayer {
+  bottom: 1.5rem !important;
+  right: 1.5rem !important;
+  left: auto !important;
+  margin: 0 !important;
+  width: 380px !important;
+  max-width: calc(100vw - 3rem) !important;
+}
+body:not(.mobile-app-mode) #exFab {
+  bottom: 1.5rem !important;
+  left: 1.5rem !important;
+  right: auto !important;
+}
+body:not(.mobile-app-mode) #appMobileShell {
+  padding-bottom: 2.5rem !important;
+}
+
+/* تنسيق تباعد الأزرار العائمة لمنع التداخل تماماً */
+#eduFloatingLauncher {
+  bottom: 5.2rem !important;
+  left: 1rem !important;
+  z-index: 38 !important;
+}
+body:not(.mobile-app-mode) #eduFloatingLauncher {
+  bottom: 5.2rem !important;
+  left: 1.5rem !important;
+}
+#exFab {
+  bottom: 9.2rem !important;
+  left: 1rem !important;
+  z-index: 37 !important;
+}
+body:not(.mobile-app-mode) #exFab {
+  bottom: 9.2rem !important;
+  left: 1.5rem !important;
+}
+
+/* تحسينات الوصولية (الإصدار 56) */
+:focus-visible { outline: 3px solid #38bdf8; outline-offset: 2px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+.skip-link { position: absolute; top: -60px; right: 8px; background: #0284c7; color: #fff; padding: 10px 16px; border-radius: 8px; z-index: 99999; font-weight: 700; }
+.skip-link:focus { top: 8px; }
+
+/* ============================================================
+   تطويرات النسخة 68: شاشة الأداة المستقلة + تثبيت الأدوات + انتقالات التطبيق
+   ============================================================ */
+@keyframes eduStudioFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body.studio-active-mode main > section {
+  animation: eduStudioFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+body.studio-active-mode #homeAds,
+body.studio-active-mode #homeVideos,
+body.studio-active-mode #announcementBanner {
+  display: none !important;
+}
+
+/* تنسيق زر التثبيت (Pin) داخل بطاقات المركز الذكي */
+.hub-pin-btn {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.55rem;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  z-index: 5;
+  transition: all 0.18s ease;
+}
+.hub-pin-btn.pinned {
+  background: rgba(245, 158, 11, 0.18);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+}
+.hub-pin-btn:not(.pinned) {
+  background: rgba(148, 163, 184, 0.12);
+  color: #94a3b8;
+  border: 1px solid transparent;
+  opacity: 0.65;
+}
+.hub-pin-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ============================================================
+   تطويرات النسخة 72: اللمسات الجمالية الفاخرة وشريط قيادة الإدارة
+   ============================================================ */
+.qs-tile {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 24px -10px rgba(2, 132, 199, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
+}
+.qs-tile:hover {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: 0 14px 28px -8px rgba(2, 132, 199, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.qs-tile::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.18), transparent);
+  transform: rotate(25deg);
+  transition: left 0.55s ease;
+  pointer-events: none;
+}
+.qs-tile:hover::after {
+  left: 130%;
+}
+
+/* شريط قيادة الإدارة الذكي (يظهر للإدارة فقط) */
+#eduAdminCommandBar {
+  background: linear-gradient(90deg, #0f172a, #1e1b4b, #0f172a);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+
+/* ============================================================
+   تطويرات النسخة 74:
+   1) عزل وحجب كامل لأي إعدادات أو أدوات تطوير عن غير الإدارة نهائياً
+   2) دمج كل ما يخص تطوير وإدارة الموقع في المركز السفلي الموحّد (#adminDevFooterHub)
+   3) شريط تقدم التصفح العلوي (#eduScrollProgress)
+   ============================================================ */
+#eduScrollProgress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 3px;
+  width: 0%;
+  z-index: 9999;
+  background: linear-gradient(90deg, #f59e0b, #22d3ee, #0284c7);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.65);
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+/* حجب قاطع لأي عنصر إداري أو إعدادات موقع عن أي زائر خارج الإدارة */
+body:not(.is-super-admin) .admin-only-ui,
+body:not(.is-super-admin) #adminDevFooterHub,
+body:not(.is-super-admin) #floatingBar,
+body:not(.is-super-admin) #btnAdminToggle,
+body:not(.is-super-admin) #btnHeroAdd,
+body:not(.is-super-admin) #btnAdminEditAnn,
+body:not(.is-super-admin) #roleStatusBannerPill,
+body:not(.is-super-admin) #eduAdminCommandBar,
+body:not(.is-super-admin) #homeAdminFab,
+body:not(.is-super-admin) #tkAdminBtn,
+body:not(.is-super-admin) [data-open-admin],
+body:not(.is-super-admin) [data-open-mgr],
+body:not(.is-super-admin) [data-admin-act] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* إخفاء الأزرار الإدارية المبعثرة القديمة حتى للإدارة بعد دمجها بالكامل في المركز السفلي الموحّد (#adminDevFooterHub) */
+#btnAdminToggle,
+#eduAdminCommandBar,
+#homeAdminFab,
+#floatingBar,
+#tkAdminBtn {
+  display: none !important;
+}
+
+/* ===== v77: تحسينات عامة آمنة ===== */
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { overflow-x: clip; }
+section[id] { scroll-margin-top: 112px; }
+:focus-visible { outline: 2px solid #0ea5e9; outline-offset: 2px; border-radius: 6px; }
+img, svg, video, canvas { max-width: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* ============================================================
+   تطويرات النسخة 78: تنسيق منظومة الأدوار الأربعة وجسر التكامل والتصفح السلس
+   ============================================================ */
+#eduRoleOrchestrator .glass-card {
+  box-shadow: 0 18px 40px -16px rgba(2, 132, 199, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.dark #eduRoleOrchestrator .glass-card {
+  box-shadow: 0 20px 44px -16px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+[data-persona-pick] {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+}
+[data-persona-pick]:hover {
+  transform: translateY(-1px);
+}
+#eduMainTrackBar [data-main-track] {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#eduMainTrackBar [data-main-track]:hover {
+  transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   تطويرات النسخة 136: تنسيق الخطوط الاحترافي، عزل الإدارة الصارم، ومنع التعليق
+   ============================================================ */
+:root {
+  --site-font: 'Cairo', 'Tajawal', system-ui, -apple-system, sans-serif;
+  --site-font-scale: 100%;
+}
+html {
+  font-size: var(--site-font-scale, 100%);
+  font-family: var(--site-font);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+body, button, input, select, textarea {
+  font-family: var(--site-font) !important;
+  line-height: 1.75;
+}
+h1, h2, h3, h4, .font-black {
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+/* عزل قاطع وصارم لأي عنصر أو تبويب أو زر إداري عن الجمهور العام */
+body:not(.is-super-admin) .admin-only-ui,
+body:not(.is-super-admin) #adminDevFooterHub,
+body:not(.is-super-admin) #orgAdminSectionBox,
+body:not(.is-super-admin) #navAdminTopBtn,
+body:not(.is-super-admin) #mobAdminTabBtn,
+body:not(.is-super-admin) [data-org-topnav="admin"],
+body:not(.is-super-admin) [data-mob-tab="admin"],
+body:not(.is-super-admin) #eag-go-admin,
+body:not(.is-super-admin) #eduSovereignAdminBar {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* شريط السيادة الإدارية العلوي يظهر للإدارة فقط */
+body.is-super-admin #eduSovereignAdminBar {
+  display: flex !important;
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.edutechmindset.app",
+      "sha256_cert_fingerprints": [
+        "07:08:97:79:CD:DF:B3:B6:FA:6B:39:AE:9E:19:79:DB:98:78:6E:89:34:21:F4:EC:27:3D:45:17:72:8F:49:BA"
+      ]
+    }
+  }
+]

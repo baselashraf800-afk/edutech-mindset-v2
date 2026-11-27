@@ -1,0 +1,49 @@
+/* ============================================================================
+ * EduTech Mindset v281 — Mobile UI/UX Polish & Visual Cohesion
+ * ============================================================================ */
+html, body {
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Smooth modal entrance across v279/v281 overlays */
+.edu-v279-modal,
+.edu-v281-modal {
+  animation: eduV281FadeIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes eduV281FadeIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Mobile header & touch ergonomics */
+@media (max-width: 640px) {
+  header.sticky {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  #unifiedToolsHub button,
+  #adminDevFooterHub button {
+    min-height: 44px;
+  }
+}
+
+/* Clean custom scrollbars for dark modals */
+.edu-v281-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.edu-v281-scroll::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.32);
+  border-radius: 999px;
+}
+
+/* v3.2.0: منع تداخل كرة المساعد وزر الصعود مع البطاقات والفوتر على الجوال */
+@media (max-width: 640px) {
+  #eduAsstOrb { width: 46px !important; height: 46px !important; font-size: 20px !important; bottom: 92px !important; left: 10px !important; opacity: 0.92 !important; }
+  #eduAsstOrb .ea-drag-hint { display: none !important; }
+  footer { padding-bottom: 105px !important; }
+  #unifiedToolsHub { padding-bottom: 24px !important; }
+}
