@@ -4,14 +4,14 @@ plugins {
 
 android {
     namespace 'com.aistudio.edutechmindset.bfkqaz'
-    compileSdk 35
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.aistudio.edutechmindset.bfkqaz"
         minSdk 24
-        targetSdk 35
-        versionCode 176
-        versionName "2.1.0"
+        targetSdk 34
+        versionCode 310
+        versionName "3.1.0"
     }
 
     signingConfigs {

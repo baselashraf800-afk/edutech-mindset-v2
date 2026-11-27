@@ -3,5 +3,9 @@
     <files-path name="vault_files" path="EduTechVault/" />
     <external-files-path name="external_files" path="." />
     <external-path name="downloads" path="Download/" />
+    <external-path name="edu_docs" path="Documents/" />
+    <external-path name="edu_pics" path="Pictures/" />
+    <external-path name="edu_music" path="Music/" />
+    <external-path name="edu_movies" path="Movies/" />
     <cache-path name="cache" path="." />
 </paths>

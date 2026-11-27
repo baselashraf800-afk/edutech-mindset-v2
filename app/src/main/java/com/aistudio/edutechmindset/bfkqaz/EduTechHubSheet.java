@@ -298,6 +298,18 @@ public class EduTechHubSheet {
                     addFeatureButton(activity, contentContainer, "41. 🃏 مراجعة بطاقات الاستذكار المحفوظة (Flashcards)", "#0D9488", () -> {
                         showFlashcardsReviewDialog(activity, prefs);
                     });
+                    addFeatureButton(activity, contentContainer, "📖 قارئ الكتب الاحترافي (Moon+ Style)", "#7C3AED", () -> {
+                        dialog.dismiss();
+                        activity.startActivity(new android.content.Intent(activity, MoonBookReaderActivity.class));
+                    });
+                    addFeatureButton(activity, contentContainer, "📁 مدير ملفات EduTech+ (تصنيف وبحث)", "#0284C7", () -> {
+                        dialog.dismiss();
+                        activity.startActivity(new android.content.Intent(activity, FileManagerPlusActivity.class));
+                    });
+                    addFeatureButton(activity, contentContainer, "🎬 مشغل الفيديو والصوتيات (MX Style)", "#EA580C", () -> {
+                        dialog.dismiss();
+                        activity.startActivity(new android.content.Intent(activity, MxMediaPlayerActivity.class));
+                    });
                     addFeatureButton(activity, contentContainer, "42. 📓 دفتر الملاحظات والمسودة السريعة التلقائية", "#D97706", () -> {
                         showQuickNotesDialog(activity, prefs);
                     });

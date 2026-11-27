@@ -6,6 +6,11 @@ import android.app.AlertDialog;
 import android.app.PictureInPictureParams;
 import android.content.Context;
 import android.content.Intent;
+import android.view.HapticFeedbackConstants;
+import android.print.PrintManager;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintAttributes;
+import android.content.pm.ActivityInfo;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -94,6 +99,10 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout findInPageBar;
     private View warmEyeOverlay;
     private FrameLayout assistantButton;
+    private FrameLayout fullscreenContainer;
+    private View customView;
+    private WebChromeClient.CustomViewCallback customViewCallback;
+    private volatile boolean isMediaPlaying = false;
 
     // Internal viewer states for BackStackManager & Volume key PDF navigation
     private AlertDialog activeHubDialog;
@@ -263,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
 
-        swipeRefreshLayout.setOnChildScrollUpCallback((parent, child) -> webView.getScrollY() > 0);
+        swipeRefreshLayout.setOnChildScrollUpCallback((parent, child) -> (webView.getScrollY() > 0 || customView != null));
         swipeRefreshLayout.setOnRefreshListener(() -> {
             if (isNetworkAvailable()) {
                 offlineOverlay.setVisibility(View.GONE);
@@ -298,6 +307,7 @@ public class MainActivity extends AppCompatActivity {
 
         webView.addJavascriptInterface(new AndroidVaultBridge(), "AndroidVault");
         webView.addJavascriptInterface(new AndroidSessionBridge(), "AndroidSession");
+        webView.addJavascriptInterface(new EduTechAndroidBridge(), "EduTechAndroid");
 
         webView.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) -> {
             if (url != null && url.startsWith("data:")) {
@@ -309,6 +319,28 @@ public class MainActivity extends AppCompatActivity {
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (request == null || request.getUrl() == null) return false;
+                Uri uri = request.getUrl();
+                String url = uri.toString();
+                String scheme = uri.getScheme() != null ? uri.getScheme().toLowerCase() : "";
+                if (scheme.equals("whatsapp") || scheme.equals("tg") || scheme.equals("tel") || scheme.equals("mailto") || scheme.equals("intent")) {
+                    try {
+                        Intent intent = scheme.equals("intent") ? Intent.parseUri(url, Intent.URI_INTENT_SCHEME) : new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
+                    } catch (Exception ignored) {}
+                    return true;
+                }
+                if (url.startsWith("https://edutech-mindset.pages.dev") || url.contains("accounts.google.com") || url.contains("firebaseapp.com") || url.contains("googleapis.com") || url.contains("youtube.com") || url.contains("youtu.be")) {
+                    return false;
+                }
+                if (scheme.equals("http") || scheme.equals("https")) {
+                    try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); } catch (Exception ignored) {}
+                    return true;
+                }
+                return false;
+            }
+            @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 swipeRefreshLayout.setRefreshing(false);
@@ -316,7 +348,10 @@ public class MainActivity extends AppCompatActivity {
                     prefs.saveLastLesson(url, view.getTitle());
                     EduTechWidgetProvider.TriggerRefresh(MainActivity.this);
                 }
+                view.evaluateJavascript("window.__IS_EDUTECH_ANDROID_APP__=true;", null);
+                view.evaluateJavascript("(function(){if(window.__eduMediaHooked)return;window.__eduMediaHooked=true;document.addEventListener('play',function(){if(window.EduTechAndroid)EduTechAndroid.setMediaPlaying(true);},true);document.addEventListener('pause',function(){if(window.EduTechAndroid)EduTechAndroid.setMediaPlaying(false);},true);document.addEventListener('ended',function(){if(window.EduTechAndroid)EduTechAndroid.setMediaPlaying(false);},true);})();", null);
                 view.evaluateJavascript(SMART_BRIDGE_JS, null);
+                view.evaluateJavascript("(function(){if(!window.__eduV310UI){window.__eduV310UI=true;var st=document.createElement('style');st.textContent='@media(max-width:768px){header .brand-text,header h1,header .site-title,header p{display:none!important;}header{overflow-x:hidden!important;}}';document.head.appendChild(st);var hdr=document.querySelector('header');if(hdr&&!document.getElementById('eduNativeFolderBtn')){var wrap=document.createElement('div');wrap.style.cssText='display:inline-flex;gap:6px;align-items:center;margin:0 6px;';var bf=document.createElement('button');bf.id='eduNativeFolderBtn';bf.type='button';bf.textContent='📁 مجلدي';bf.style.cssText='background:#0f4c5c;color:#fff;border:0;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:800;cursor:pointer;';bf.onclick=function(){if(window.AndroidVault&&AndroidVault.openMyFolder)AndroidVault.openMyFolder();};var bw=document.createElement('button');bw.id='eduNativeWbBtn';bw.type='button';bw.textContent='🖍️ السبورة';bw.style.cssText='background:#d97706;color:#fff;border:0;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:800;cursor:pointer;';bw.onclick=function(){if(window.AndroidVault&&AndroidVault.openSmartWhiteboard)AndroidVault.openSmartWhiteboard();};wrap.appendChild(bf);wrap.appendChild(bw);hdr.appendChild(wrap);}document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('a[download]'):null;if(!a||!a.href||!a.href.startsWith('blob:'))return;if(!window.AndroidVault||!AndroidVault.saveUniversalFile)return;e.preventDefault();var fn=a.getAttribute('download')||('edutech_'+Date.now()+'.pdf');fetch(a.href).then(function(r){return r.blob();}).then(function(bl){var rd=new FileReader();rd.onloadend=function(){var res=String(rd.result||'');var idx=res.indexOf(',');AndroidVault.saveUniversalFile(idx>-1?res.slice(idx+1):res,fn,bl.type||'application/octet-stream');};rd.readAsDataURL(bl);}).catch(function(){});},true);}})();", null);
                 restoreSyncedSessionToWebView(view);
             }
 
@@ -350,6 +385,45 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 }
                 return true;
+            }
+
+            @Override
+            public void onShowCustomView(View view, CustomViewCallback callback) {
+                if (customView != null) {
+                    onHideCustomView();
+                    return;
+                }
+                customView = view;
+                customViewCallback = callback;
+                if (fullscreenContainer == null) {
+                    fullscreenContainer = new FrameLayout(MainActivity.this);
+                    fullscreenContainer.setBackgroundColor(Color.BLACK);
+                }
+                fullscreenContainer.removeAllViews();
+                fullscreenContainer.addView(view, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                ViewGroup decor = (ViewGroup) getWindow().getDecorView();
+                if (fullscreenContainer.getParent() == null) {
+                    decor.addView(fullscreenContainer, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                }
+                fullscreenContainer.setVisibility(View.VISIBLE);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+
+            @Override
+            public void onHideCustomView() {
+                if (customView == null) return;
+                if (fullscreenContainer != null) {
+                    fullscreenContainer.removeAllViews();
+                    fullscreenContainer.setVisibility(View.GONE);
+                }
+                customView = null;
+                if (customViewCallback != null) {
+                    try { customViewCallback.onCustomViewHidden(); } catch (Exception ignored) {}
+                    customViewCallback = null;
+                }
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             }
 
             @Override
@@ -841,6 +915,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showLocalLibraryDialog() {
+        startActivity(new Intent(MainActivity.this, FileManagerPlusActivity.class));
+    }
+    void showLegacyLocalLibraryDialog() {
         File dir = getVaultDirectory();
         File[] files = dir.listFiles();
         final List<File> itemList = new ArrayList<>();
@@ -1276,19 +1353,31 @@ public class MainActivity extends AppCompatActivity {
         if ("VOICE".equals(shortcut)) {
             startVoiceInput();
         } else if ("VAULT".equals(shortcut)) {
-            showLocalLibraryDialog();
+            startActivity(new Intent(this, MyFolderActivity.class));
         } else if ("OVERLAY".equals(shortcut)) {
             requestSystemOverlayBubble();
         } else if ("WHITEBOARD".equals(shortcut)) {
-            studyToolsOverlay.showWhiteboard();
+            startActivity(new Intent(this, SmartWhiteboardActivity.class));
         } else if ("POMODORO".equals(shortcut)) {
             studyToolsOverlay.startTimerOverlay(25, "بومودورو 25 د");
         } else if ("RESUME_LESSON".equals(shortcut)) {
             webView.loadUrl(prefs.getLastLessonUrl());
+        } else if (Intent.ACTION_SEND.equals(intent.getAction())) {
+            Uri sharedUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            if (sharedUri != null) {
+                importSharedFileToMyFolder(sharedUri, intent.getType());
+            } else {
+                String txt = intent.getStringExtra(Intent.EXTRA_TEXT);
+                if (txt != null && !txt.trim().isEmpty()) {
+                    Toast.makeText(this, "تم استلام النص في EduTech Mindset ✓", Toast.LENGTH_SHORT).show();
+                }
+            }
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
             Uri data = intent.getData();
             if ("http".equals(data.getScheme()) || "https".equals(data.getScheme())) {
                 webView.loadUrl(data.toString());
+            } else {
+                importSharedFileToMyFolder(data, intent.getType());
             }
         }
     }
@@ -1356,6 +1445,121 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        if (customView != null || isMediaPlaying) {
+            enterPipWindow();
+        }
+    }
+
+    public class EduTechAndroidBridge {
+        @JavascriptInterface
+        public void saveBase64File(String b64, String fileName, String mime, String subFolder) {
+            String prefix = "data:" + (mime != null ? mime : "application/octet-stream") + ";base64,";
+            runOnUiThread(() -> saveDataUrlToDevice(prefix + (b64 != null ? b64 : ""), fileName != null ? fileName : ("EduTech_" + System.currentTimeMillis())));
+        }
+
+        @JavascriptInterface
+        public void printPage() {
+            runOnUiThread(() -> {
+                try {
+                    PrintManager pm = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+                    if (pm != null && webView != null) {
+                        PrintDocumentAdapter adapter = webView.createPrintDocumentAdapter("EduTech_Mindset_Doc");
+                        pm.print("EduTech Mindset Document", adapter, new PrintAttributes.Builder().build());
+                    }
+                } catch (Exception ignored) {}
+            });
+        }
+
+        @JavascriptInterface
+        public void enterPip() {
+            runOnUiThread(() -> enterPipWindow());
+        }
+
+        @JavascriptInterface
+        public void setMediaPlaying(boolean playing) {
+            isMediaPlaying = playing;
+        }
+
+        @JavascriptInterface
+        public void openVault() {
+            runOnUiThread(() -> startActivity(new Intent(MainActivity.this, FileManagerPlusActivity.class)));
+        }
+
+        @JavascriptInterface
+        public void openBookReader() {
+            runOnUiThread(() -> startActivity(new Intent(MainActivity.this, MoonBookReaderActivity.class)));
+        }
+
+        @JavascriptInterface
+        public void openMediaPlayer() {
+            runOnUiThread(() -> startActivity(new Intent(MainActivity.this, MxMediaPlayerActivity.class)));
+        }
+
+        @JavascriptInterface
+        public void hapticLight() {
+            runOnUiThread(() -> {
+                try {
+                    if (webView != null) webView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+                } catch (Exception ignored) {}
+            });
+        }
+    }
+
+    private void importSharedFileToMyFolder(Uri uri, String mime) {
+        try {
+            String subDir = "PDF";
+            String ext = ".pdf";
+            if (mime != null) {
+                if (mime.startsWith("image/")) { subDir = "Images"; ext = ".jpg"; }
+                else if (mime.startsWith("audio/")) { subDir = "Audio"; ext = ".mp3"; }
+                else if (mime.contains("word") || mime.contains("document")) { subDir = "Word"; ext = ".docx"; }
+            }
+            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "EduTech_Mindset/" + subDir);
+            if (!dir.exists()) dir.mkdirs();
+            String name = "Shared_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ext;
+            File out = new File(dir, name);
+            try (InputStream in = getContentResolver().openInputStream(uri);
+                 FileOutputStream fos = new FileOutputStream(out)) {
+                if (in != null) {
+                    byte[] buf = new byte[8192];
+                    int r;
+                    while ((r = in.read(buf)) != -1) fos.write(buf, 0, r);
+                }
+            }
+            new EduTechDatabaseHelper(this).insertSavedFile(name, out.getAbsolutePath(), subDir, mime);
+            Toast.makeText(this, "تم حفظ الملف المستلم في مجلدي ✓", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, MyFolderActivity.class));
+        } catch (Exception e) {
+            Toast.makeText(this, "تعذر استيراد الملف المشارك", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void saveUniversalBase64ToDownloads(String b64, String fileName, String mime) {
+        try {
+            String safeName = (fileName == null || fileName.trim().isEmpty()) ? ("EduTech_" + System.currentTimeMillis() + ".pdf") : fileName.replaceAll("[^a-zA-Z0-9._\\-\\u0600-\\u06FF ]", "_");
+            String low = safeName.toLowerCase(Locale.US);
+            String subDir = "PDF";
+            if (low.endsWith(".doc") || low.endsWith(".docx") || (mime != null && mime.contains("word"))) subDir = "Word";
+            else if (low.endsWith(".mp3") || low.endsWith(".wav") || (mime != null && mime.startsWith("audio/"))) subDir = "Audio";
+            else if (low.endsWith(".png") || low.endsWith(".jpg") || low.endsWith(".jpeg") || (mime != null && mime.startsWith("image/"))) subDir = "Images";
+
+            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "EduTech_Mindset/" + subDir);
+            if (!dir.exists()) dir.mkdirs();
+            File outFile = new File(dir, safeName);
+            byte[] bytes = Base64.decode(b64, Base64.DEFAULT);
+            try (FileOutputStream fos = new FileOutputStream(outFile)) {
+                fos.write(bytes);
+            }
+            new EduTechDatabaseHelper(this).insertSavedFile(safeName, outFile.getAbsolutePath(), subDir, mime);
+            Toast.makeText(this, "تم الحفظ في Downloads/EduTech_Mindset/" + subDir + " ✓", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "تعذر حفظ الملف: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
     public class AndroidVaultBridge {
         @JavascriptInterface
         public void saveDataUrl(String dataUrl, String fileName) {
@@ -1363,8 +1567,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
+        public void saveUniversalFile(String base64Data, String fileName, String mimeType) {
+            runOnUiThread(() -> saveUniversalBase64ToDownloads(base64Data, fileName, mimeType));
+        }
+
+        @JavascriptInterface
         public void openVault() {
-            runOnUiThread(() -> showLocalLibraryDialog());
+            runOnUiThread(() -> startActivity(new Intent(MainActivity.this, MyFolderActivity.class)));
+        }
+
+        @JavascriptInterface
+        public void openMyFolder() {
+            runOnUiThread(() -> startActivity(new Intent(MainActivity.this, MyFolderActivity.class)));
+        }
+
+        @JavascriptInterface
+        public void openSmartWhiteboard() {
+            runOnUiThread(() -> startActivity(new Intent(MainActivity.this, SmartWhiteboardActivity.class)));
         }
     }
 

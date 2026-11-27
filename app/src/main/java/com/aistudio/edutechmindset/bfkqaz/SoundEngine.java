@@ -84,4 +84,6 @@ public class SoundEngine {
             }
         }).start();
     }
+
+    public void playIntro() { }
 }

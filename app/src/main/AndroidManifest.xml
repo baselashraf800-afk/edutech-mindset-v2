@@ -31,7 +31,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="false"
         android:hardwareAccelerated="true"
         android:largeHeap="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
@@ -61,6 +61,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/pdf" />
+                <data android:mimeType="image/*" />
                 <data android:mimeType="audio/*" />
                 <data android:mimeType="video/*" />
             </intent-filter>
@@ -69,6 +70,7 @@
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/pdf" />
+                <data android:mimeType="image/*" />
                 <data android:mimeType="audio/*" />
                 <data android:mimeType="video/*" />
                 <data android:mimeType="text/plain" />
@@ -121,5 +123,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+            <activity android:name=".SmartWhiteboardActivity" android:exported="false" android:configChanges="orientation|screenSize|keyboardHidden" android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity android:name=".MyFolderActivity" android:exported="false" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".MoonBookReaderActivity" android:exported="false" android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity android:name=".FileManagerPlusActivity" android:exported="false" android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity android:name=".MxMediaPlayerActivity" android:exported="false" android:supportsPictureInPicture="true" android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation" android:theme="@style/Theme.AppCompat.NoActionBar" />
     </application>
 </manifest>
