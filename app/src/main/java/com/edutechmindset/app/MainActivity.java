@@ -1,4 +1,4 @@
-package com.aistudio.edutechmindset.bfkqaz;
+package com.edutechmindset.app;
 
 import android.Manifest;
 import android.annotation.SuppressLint;

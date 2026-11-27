@@ -1,4 +1,4 @@
-package com.aistudio.edutechmindset.bfkqaz;
+package com.edutechmindset.app;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 public class EduTechWidgetProvider extends AppWidgetProvider {
-    public static final String ACTION_WIDGET_REFRESH = "com.aistudio.edutechmindset.bfkqaz.ACTION_WIDGET_REFRESH";
+    public static final String ACTION_WIDGET_REFRESH = "com.edutechmindset.app.ACTION_WIDGET_REFRESH";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {

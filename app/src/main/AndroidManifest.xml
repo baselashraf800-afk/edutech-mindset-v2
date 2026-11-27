@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.aistudio.edutechmindset.bfkqaz">
+    package="com.edutechmindset.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -97,7 +97,7 @@
             android:label="@string/widget_title">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.aistudio.edutechmindset.bfkqaz.ACTION_WIDGET_REFRESH" />
+                <action android:name="com.edutechmindset.app.ACTION_WIDGET_REFRESH" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -109,7 +109,7 @@
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.aistudio.edutechmindset.bfkqaz.STUDY_REMINDER" />
+                <action android:name="com.edutechmindset.app.STUDY_REMINDER" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>

@@ -1,4 +1,4 @@
-package com.aistudio.edutechmindset.bfkqaz;
+package com.edutechmindset.app;
 
 import android.content.Intent;
 import android.graphics.Color;

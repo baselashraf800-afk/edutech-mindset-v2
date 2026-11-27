@@ -1,4 +1,4 @@
-package com.aistudio.edutechmindset.bfkqaz;
+package com.edutechmindset.app;
 
 import android.media.AudioAttributes;
 import android.media.AudioFormat;

@@ -1,4 +1,4 @@
-package com.aistudio.edutechmindset.bfkqaz;
+package com.edutechmindset.app;
 
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
@@ -12,7 +12,7 @@ import androidx.core.app.NotificationCompat;
 import java.util.Calendar;
 
 public class StudyReminderReceiver extends BroadcastReceiver {
-    public static final String ACTION_STUDY_REMINDER = "com.aistudio.edutechmindset.bfkqaz.STUDY_REMINDER";
+    public static final String ACTION_STUDY_REMINDER = "com.edutechmindset.app.STUDY_REMINDER";
     private static final String CHANNEL_ID = "edutech_study_reminder";
 
     @Override

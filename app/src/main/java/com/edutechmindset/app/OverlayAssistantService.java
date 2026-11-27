@@ -1,4 +1,4 @@
-package com.aistudio.edutechmindset.bfkqaz;
+package com.edutechmindset.app;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
@@ -30,7 +30,7 @@ import android.widget.ImageView;
 import androidx.core.app.NotificationCompat;
 
 public class OverlayAssistantService extends Service {
-    public static final String ACTION_STOP = "com.aistudio.edutechmindset.bfkqaz.STOP_OVERLAY";
+    public static final String ACTION_STOP = "com.edutechmindset.app.STOP_OVERLAY";
     public static final String ACTION_HIDE = "HIDE_OVERLAY";
     public static final String ACTION_SHOW = "SHOW_OVERLAY";
     private static final String CHANNEL_ID = "edutech_overlay_channel";

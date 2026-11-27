@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.aistudio.edutechmindset.bfkqaz'
+    namespace 'com.edutechmindset.app'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.aistudio.edutechmindset.bfkqaz"
+        applicationId "com.edutechmindset.app"
         minSdk 24
         targetSdk 34
         versionCode 310
