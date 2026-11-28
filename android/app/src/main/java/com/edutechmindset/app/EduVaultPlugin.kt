@@ -27,16 +27,28 @@ class EduVaultPlugin : Plugin() {
 
     @PluginMethod
     fun saveToDocuments(call: PluginCall) {
-        val folder = call.getString("folder") ?: "General"
-        val fileName = call.getString("fileName") ?: "file_${System.currentTimeMillis()}.bin"
+        val rawFolder = call.getString("folder") ?: "General"
+        val rawFileName = call.getString("fileName") ?: "file_${System.currentTimeMillis()}.bin"
         val b64 = call.getString("base64") ?: ""
         try {
-            val baseDir = File(
-                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-                "EduTechMindset/$folder"
-            )
+            val safeFolder = rawFolder.replace(Regex("[^\\u0600-\\u06FFa-zA-Z0-9_\\-]"), "_").trim('_').ifBlank { "General" }
+            val safeFileName = rawFileName
+                .substringAfterLast('/')
+                .substringAfterLast('\\')
+                .replace("..", "_")
+                .replace(Regex("[^\\u0600-\\u06FFa-zA-Z0-9._\\- ]"), "_")
+                .trim()
+                .ifBlank { "file_${System.currentTimeMillis()}.bin" }
+            val rootDir = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "EduTechMindset")
+            val baseDir = File(rootDir, safeFolder)
             if (!baseDir.exists()) baseDir.mkdirs()
-            val outFile = File(baseDir, fileName)
+            val outFile = File(baseDir, safeFileName)
+            val rootCanonical = rootDir.canonicalPath
+            val outCanonical = outFile.canonicalPath
+            if (!outCanonical.startsWith(rootCanonical + File.separator)) {
+                call.reject("Invalid target path")
+                return
+            }
             FileOutputStream(outFile).use { it.write(Base64.decode(b64, Base64.DEFAULT)) }
             val ret = JSObject()
             ret.put("ok", true)
