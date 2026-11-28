@@ -4,3 +4,8 @@ android/app/build/
 android/build/
 *.iml
 .DS_Store
+
+# Signing keystores (never commit)
+*.keystore
+*.jks
+keystore.properties
