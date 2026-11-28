@@ -1,29 +1,111 @@
 /* ============================================================================
- * EduTech Mindset v3.2.0 — Option 2 Clean Mobile Header, Drawer Quick Tools,
- * Ads Fix, Guaranteed Offline Export Bridge & Floating Assistant Isolation
+ * EduTech Mindset v3.2.1 — Smooth Native Performance, Zero Double-Splash,
+ * Smart Android Back Button, Option 2 Mobile Header, Ads Fix & Export Bridge
  * ============================================================================ */
 (function (global) {
   "use strict";
 
-  if (global.__EDU_V320_LOADED__) return;
-  global.__EDU_V320_LOADED__ = true;
+  if (global.__EDU_V321_LOADED__) return;
+  global.__EDU_V321_LOADED__ = true;
 
   var isNative = !!(global.EduTechAndroid || /EduTechMindsetApp/i.test(navigator.userAgent || ""));
   var isFloating = (location.search || "").indexOf("floating=assistant") >= 0;
   var ORIGIN_LIVE = "https://edutech-mindset.pages.dev";
 
-  // Remove any legacy v310 injected clutter if live site loaded older script first
-  function cleanupLegacy() {
-    var oldCss = document.getElementById("eduV310PolishCss");
-    if (oldCss) oldCss.remove();
-    var oldBar = document.getElementById("eduV310QuickBar");
-    if (oldBar) oldBar.remove();
+  // 0) Suppress redundant web HTML splash screens inside Android app (prevents double-splash flicker!)
+  if (isNative) {
+    try {
+      sessionStorage.setItem("edu_splash_shown_v1", "1");
+      sessionStorage.setItem("edu_splash_shown_v242", "1");
+    } catch (_) {}
   }
 
-  // 1) Floating Assistant Isolated Mode (?floating=assistant)
+  // 1) Smart Hardware Back Button Handler for SPA Modals, Drawers & Overlays
+  global.EduAppHandleBack = function () {
+    try {
+      // Close Fresh Drawer if open
+      var drawer = document.getElementById("eduFreshDrawer");
+      if (drawer) {
+        if (global.EduFreshDrawer && typeof global.EduFreshDrawer.close === "function") {
+          global.EduFreshDrawer.close();
+        } else {
+          drawer.remove();
+        }
+        return true;
+      }
+
+      // Close AI Assistant if open
+      var asst = document.getElementById("eduAsst");
+      if (asst && (asst.classList.contains("open") || asst.style.display === "flex")) {
+        var closeAsst = asst.querySelector("[data-mact='close'], .ea-close, button[aria-label*='إغلاق']");
+        if (closeAsst) closeAsst.click();
+        else { asst.classList.remove("open"); asst.style.display = "none"; }
+        return true;
+      }
+
+      // Close any known dynamic modals (newest first)
+      var knownModals = [
+        "eduNativeHubModal", "v289AndroidCfgModal", "eduAuthUnifiedModal",
+        "v187ReaderModal", "v187VideoModal", "v187AudioModal", "v187VaultHubModal",
+        "v188IslamicModal", "v189TeacherHubModal", "v185LessonPrepModal", "v186QuizMakerModal",
+        "v191EnrollModal", "v191CoursesHubModal", "v193OfficialBookModal",
+        "eduV173ReelsModal", "eduV173CertModal", "eduV174QrModal", "eduV174FbModal",
+        "eduV175ProReaderModal", "v201FcModal", "v202AsstModal", "eduUnifiedAdminHubModal",
+        "eduCourseCertModal", "eduCertModal", "eduLessonKitModal", "eduWeeklyPortModal",
+        "eduGlobalSearchModal", "eduBgMusicModal"
+      ];
+      for (var i = 0; i < knownModals.length; i++) {
+        var m = document.getElementById(knownModals[i]);
+        if (m && !m.classList.contains("hidden") && m.style.display !== "none") {
+          m.remove();
+          return true;
+        }
+      }
+
+      // Close generic #modalContainer if visible
+      var mc = document.getElementById("modalContainer");
+      if (mc && !mc.classList.contains("hidden") && mc.innerHTML.trim().length > 0) {
+        var xBtn = mc.querySelector("button[id*='Close'], button[id*='close'], button[aria-label*='إغلاق']");
+        if (xBtn) xBtn.click();
+        else { mc.classList.add("hidden"); mc.innerHTML = ""; }
+        return true;
+      }
+
+      // Close any high-z fixed fullscreen overlay modal dynamically created
+      var fixedOverlays = document.querySelectorAll("body > div[style*='position:fixed'], body > div[style*='position: fixed']");
+      for (var j = fixedOverlays.length - 1; j >= 0; j--) {
+        var el = fixedOverlays[j];
+        var id = el.id || "";
+        if (id === "eduAsstOrb" || id === "eduToastWrap" || id === "mobileBottomNav") continue;
+        var st = getComputedStyle(el);
+        var z = parseInt(st.zIndex, 10) || 0;
+        if (st.display !== "none" && z >= 9000 && el.offsetWidth > window.innerWidth * 0.65 && el.offsetHeight > window.innerHeight * 0.45) {
+          var closeBtn = el.querySelector("button[id*='Close'], button[id*='close'], button[id*='X']");
+          if (closeBtn) closeBtn.click();
+          else el.remove();
+          return true;
+        }
+      }
+    } catch (_) {}
+    return false;
+  };
+
+  // Remove any legacy injected clutter
+  function cleanupLegacy() {
+    ["eduV310PolishCss", "eduV310QuickBar", "eduV320PolishCss"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.remove();
+    });
+    if (isNative) {
+      var webSplash = document.getElementById("eduSplashIntro");
+      if (webSplash) webSplash.remove();
+    }
+  }
+
+  // 2) Floating Assistant Isolated Mode (?floating=assistant)
   if (isFloating) {
     var flCss = document.createElement("style");
-    flCss.id = "eduV320FloatCss";
+    flCss.id = "eduV321FloatCss";
     flCss.textContent = [
       "header, footer, #tkBar, #homeAds, #eduHeroWelcomeStage, #learnSection, #unifiedToolsHub, #coursesSection, #mobileBottomNav, #eduAsstOrb { display: none !important; }",
       "#eduAsst { display: flex !important; inset: 0 !important; width: 100vw !important; height: 100dvh !important; max-height: 100dvh !important; border-radius: 0 !important; }"
@@ -38,23 +120,24 @@
     setTimeout(function () { clearInterval(openTimer); }, 8000);
   }
 
-  // 2) Option 2 Elegant Mobile Header + Ads CSS Fix
-  function applyOption2HeaderCss() {
+  // 3) Option 2 Clean Mobile Header + Performance Boost + Zero Double-Splash CSS
+  function applyPolishCss() {
     cleanupLegacy();
-    if (document.getElementById("eduV320PolishCss")) return;
+    if (document.getElementById("eduV321PolishCss")) return;
     var uiCss = document.createElement("style");
-    uiCss.id = "eduV320PolishCss";
+    uiCss.id = "eduV321PolishCss";
     uiCss.textContent = [
+      /* Never show redundant web HTML splash inside native Android app */
+      isNative ? "#eduSplashIntro, .edu-pwa-splash { display: none !important; opacity: 0 !important; pointer-events: none !important; }" : "",
+      /* Smoothness boost inside Android WebView: disable heavy blur & GPU-draining pulse animations */
+      isNative ? "*, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }" : "",
       /* Ads visibility & Data Saver fix */
       "body.edu-data-saver #homeAds img { display: block !important; opacity: 1 !important; }",
-      "#homeAds #adStage { min-height: 195px; }",
+      "#homeAds #adStage { min-height: 190px; }",
       "#homeAds #adStage img { object-fit: cover; background: #020617; }",
       /* Hide APK Install button when already inside the Android app */
       isNative ? "#btnHeaderInstallApp { display: none !important; }" : "",
-      /* Option 2 Clean Mobile Header (<= 640px):
-         Right (RTL start): Logo icon only + compact ☰ menu button
-         Left (RTL end): Search + 📁 مجلدي + Favorites + Dark Mode + Account/Login
-         A (Font) and 🎵 (Music) moved to top of ☰ drawer! */
+      /* Option 2 Clean Mobile Header (<= 640px) */
       "@media (max-width: 640px) {",
       "  #siteTopHeader .header-main-row { padding-inline: 8px !important; gap: 6px !important; height: 54px !important; overflow-x: clip !important; }",
       "  #brandLine1, #brandLine2 { display: none !important; }",
@@ -68,8 +151,7 @@
       "  #btnGoogleLoginHeader span { max-width: 44px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }",
       "  #btnFavFilter, #btnThemeToggle { padding: 7px !important; border-radius: 10px !important; }",
       "}",
-      ".edu-v320-folder-btn { width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.45); background: rgba(2,132,199,0.16); color: #38bdf8; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: transform 0.15s; }",
-      ".edu-v320-folder-btn:active { transform: scale(0.92); }",
+      ".edu-v320-folder-btn { width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.45); background: rgba(2,132,199,0.16); color: #38bdf8; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }",
       "#eduDrawerQuickStrip { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; border-bottom: 1px solid rgba(148,163,184,0.2); background: rgba(15,23,42,0.06); }",
       ".dark #eduDrawerQuickStrip { background: rgba(255,255,255,0.04); }",
       ".edu-dq-btn { flex: 1 1 auto; min-width: 58px; padding: 7px 8px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.3); background: rgba(2,132,199,0.12); color: inherit; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }"
@@ -77,7 +159,6 @@
     document.head.appendChild(uiCss);
   }
 
-  // Re-arrange header for Option 2 on mobile: Logo + ☰ on right, tools + 📁 on left
   function enhanceOption2HeaderDom() {
     if (isFloating) return;
     var row = document.querySelector("#siteTopHeader .header-main-row");
@@ -86,7 +167,6 @@
     var menuBtn = document.getElementById("btnMenuToggle");
     var toolsBox = document.getElementById("btnThemeToggle") ? document.getElementById("btnThemeToggle").parentElement : null;
 
-    // Group Logo + ☰ together on the RTL start (right) side on mobile
     if (brand && menuBtn && !document.getElementById("eduRightBrandGroup")) {
       var rightGroup = document.createElement("div");
       rightGroup.id = "eduRightBrandGroup";
@@ -96,7 +176,6 @@
       rightGroup.appendChild(menuBtn);
     }
 
-    // Add single clean 📁 مجلدي button in the left utility row (inside Android app)
     if (isNative && toolsBox && !document.getElementById("eduBtnMyFolder")) {
       var folderBtn = document.createElement("button");
       folderBtn.id = "eduBtnMyFolder";
@@ -118,14 +197,12 @@
       }
     }
 
-    // Shorten Google Login label on mobile so it fits cleanly
     var gSpan = document.querySelector("#btnGoogleLoginHeader span");
     if (gSpan && window.innerWidth <= 640 && gSpan.textContent.indexOf("بحساب") >= 0) {
       gSpan.textContent = "دخول";
     }
   }
 
-  // Inject A (Font), 🎵 (Music), and native quick tools (✏️ السبورة, 📚 الكتب, 🤖 العائم) at top of ☰ drawer
   function injectDrawerQuickStrip(panel) {
     if (!panel || panel.querySelector("#eduDrawerQuickStrip")) return;
     var strip = document.createElement("div");
@@ -159,12 +236,8 @@
         else if (act === "float" && global.EduTechAndroid.startFloatingAi) global.EduTechAndroid.startFloatingAi();
       }
     });
-    // Insert right after drawer header (first child)
-    if (panel.children.length > 1) {
-      panel.insertBefore(strip, panel.children[1]);
-    } else {
-      panel.appendChild(strip);
-    }
+    if (panel.children.length > 1) panel.insertBefore(strip, panel.children[1]);
+    else panel.appendChild(strip);
   }
 
   function observeDrawer() {
@@ -176,7 +249,7 @@
     obs.observe(document.body, { childList: true, subtree: false });
   }
 
-  // 3) Guaranteed Export Engine (Fixes stuck "جارٍ تجهيز محرك التصدير...")
+  // 4) Guaranteed Export Engine (Fixes stuck "جارٍ تجهيز محرك التصدير...")
   function utf8ToBase64(str) {
     return btoa(unescape(encodeURIComponent(str)));
   }
@@ -237,7 +310,7 @@
     });
   }
 
-  // 4) Fix Relative Ad Image URLs & Cache #homeAds for Instant Offline Display
+  // 5) Fix Relative Ad Image URLs & Cache #homeAds for Instant Offline Display
   function fixAdsImagesAndCache() {
     var ads = document.getElementById("homeAds");
     if (!ads) return;
@@ -261,15 +334,14 @@
   }
 
   function onReady() {
-    applyOption2HeaderCss();
+    applyPolishCss();
     enhanceOption2HeaderDom();
     observeDrawer();
     ensureExporterReady();
     fixAdsImagesAndCache();
-    setTimeout(enhanceOption2HeaderDom, 800);
+    setTimeout(enhanceOption2HeaderDom, 700);
     setTimeout(fixAdsImagesAndCache, 1800);
     setTimeout(fixAdsImagesAndCache, 4500);
-    setInterval(ensureExporterReady, 2500);
   }
 
   if (document.readyState === "loading") {

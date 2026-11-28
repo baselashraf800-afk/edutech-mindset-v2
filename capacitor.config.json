@@ -12,14 +12,18 @@
       "edutech-mindset-claud.firebaseapp.com",
       "*.firebaseapp.com",
       "accounts.google.com",
+      "accounts.youtube.com",
+      "*.youtube.com",
       "*.google.com",
+      "*.google.ps",
       "*.googleapis.com",
-      "*.gstatic.com"
+      "*.gstatic.com",
+      "*.googleusercontent.com"
     ]
   },
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 1200,
+      "launchShowDuration": 0,
       "backgroundColor": "#020617",
       "showSpinner": false
     },

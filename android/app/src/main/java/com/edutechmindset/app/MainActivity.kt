@@ -17,6 +17,7 @@ import android.provider.OpenableColumns
 import android.provider.Settings
 import android.util.Rational
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.webkit.*
@@ -63,9 +64,13 @@ class MainActivity : BridgeActivity() {
     private fun isAllowedInAppAuthHost(host: String): Boolean {
         val h = host.lowercase()
         return h.endsWith("edutech-mindset.pages.dev") ||
+            h.endsWith("pages.dev") ||
             h.endsWith("firebaseapp.com") ||
             h.endsWith("accounts.google.com") ||
+            h.endsWith("accounts.youtube.com") ||
+            h.endsWith("youtube.com") ||
             h.endsWith("google.com") ||
+            h.endsWith("google.ps") ||
             h.endsWith("googleapis.com") ||
             h.endsWith("gstatic.com") ||
             h.endsWith("googleusercontent.com")
@@ -74,10 +79,14 @@ class MainActivity : BridgeActivity() {
     private fun configureWebViewForAuthAndMedia() {
         try {
             val wv = bridge?.webView ?: return
+            wv.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+            wv.setBackgroundColor(Color.parseColor("#020617"))
+
             val settings = wv.settings
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.databaseEnabled = true
+            settings.cacheMode = WebSettings.LOAD_DEFAULT
             settings.mediaPlaybackRequiresUserGesture = false
             settings.javaScriptCanOpenWindowsAutomatically = true
             settings.setSupportMultipleWindows(true)
@@ -88,12 +97,9 @@ class MainActivity : BridgeActivity() {
             cm.setAcceptThirdPartyCookies(wv, true)
             wv.addJavascriptInterface(EduTechAndroidBridge(), "EduTechAndroid")
 
-            // Keep Google OAuth & Firebase Auth strictly inside the app (never launch Edge / 400 error)
-            // and inject v3.2.0 native UI/header/ads/export polish on every page load
             wv.webViewClient = object : BridgeWebViewClient(bridge) {
                 override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                    val uri = request.url
-                    val host = uri?.host ?: ""
+                    val host = request.url?.host ?: ""
                     if (isAllowedInAppAuthHost(host)) {
                         return false
                     }
@@ -104,9 +110,42 @@ class MainActivity : BridgeActivity() {
                     super.onPageFinished(view, url)
                     injectNativePolishScript(view)
                 }
+
+                override fun onReceivedError(
+                    view: WebView,
+                    request: WebResourceRequest,
+                    error: WebResourceError
+                ) {
+                    if (request.isForMainFrame) {
+                        // Never trap user on white net::ERR_FAILED dead-end screen
+                        val failedUrl = request.url?.toString() ?: "https://edutech-mindset.pages.dev/"
+                        val recoveryHtml = """
+                            <!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+                            <meta name="viewport" content="width=device-width,initial-scale=1">
+                            <style>
+                            body{margin:0;min-height:100vh;background:#020617;color:#fff;font-family:sans-serif;
+                            display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;}
+                            .card{max-width:360px;width:100%;background:#0f172a;border:1px solid #1e293b;border-radius:22px;padding:24px;}
+                            h2{margin:0 0 8px;color:#38bdf8;font-size:18px;}
+                            p{margin:0 0 18px;color:#94a3b8;font-size:13px;line-height:1.7;}
+                            button{width:100%;padding:12px;border:none;border-radius:14px;font-weight:bold;font-size:14px;margin-bottom:10px;cursor:pointer;}
+                            .b1{background:#0284c7;color:#fff;} .b2{background:#1e293b;color:#e2e8f0;border:1px solid #334155;}
+                            </style></head><body><div class="card">
+                            <h2>📡 تعذر تحميل الصفحة مؤقتاً</h2>
+                            <p>حدث انقطاع لحظي في الاتصال. يمكنك إعادة المحاولة فوراً أو فتح ملفاتك وكتبك المحفوظة أوفلاين.</p>
+                            <button class="b1" onclick="location.href='$failedUrl'">🔄 إعادة التحميل الآن</button>
+                            <button class="b2" onclick="if(window.EduTechAndroid)EduTechAndroid.openMyFolder()">📁 فتح مجلدي (أوفلاين)</button>
+                            <button class="b2" onclick="if(window.EduTechAndroid)EduTechAndroid.openBookReader()">📚 فتح مكتبة الكتب</button>
+                            </div></body></html>
+                        """.trimIndent()
+                        view.loadDataWithBaseURL("https://edutech-mindset.pages.dev/", recoveryHtml, "text/html", "UTF-8", null)
+                        return
+                    }
+                    super.onReceivedError(view, request, error)
+                }
             }
 
-            // Support Firebase signInWithPopup inside an in-app modal WebView with shared cookies & clean Chrome UA
+            // Support Firebase signInWithPopup inside an in-app modal WebView (keeps Google & YouTube SetSID inside app!)
             wv.webChromeClient = object : BridgeWebChromeClient(bridge) {
                 override fun onCreateWindow(
                     view: WebView?,
@@ -168,8 +207,7 @@ class MainActivity : BridgeActivity() {
                     cm.setAcceptThirdPartyCookies(this, true)
                     webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                            val host = request.url?.host ?: ""
-                            if (isAllowedInAppAuthHost(host)) return false
+                            // Keep EVERY OAuth redirect (including accounts.youtube.com SetSID) strictly inside popupWv!
                             return false
                         }
                     }
@@ -219,17 +257,27 @@ class MainActivity : BridgeActivity() {
             return
         }
         val wv = bridge?.webView
-        if (wv != null && wv.canGoBack()) {
-            wv.goBack()
+        if (wv != null) {
+            // First ask the SPA to close any open drawer / modal / assistant / tool panel cleanly
+            wv.evaluateJavascript("(function(){try{return window.EduAppHandleBack ? !!window.EduAppHandleBack() : false;}catch(e){return false;}})()") { res ->
+                runOnUiThread {
+                    if (res == "true") return@runOnUiThread
+                    if (wv.canGoBack()) {
+                        wv.goBack()
+                    } else {
+                        val now = System.currentTimeMillis()
+                        if (now - lastBackPressedAt < 2000L) {
+                            finish()
+                        } else {
+                            lastBackPressedAt = now
+                            Toast.makeText(this, "اضغط رجوع مرة أخرى للخروج من التطبيق", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
             return
         }
-        val now = System.currentTimeMillis()
-        if (now - lastBackPressedAt < 2000L) {
-            super.onBackPressed()
-        } else {
-            lastBackPressedAt = now
-            Toast.makeText(this, "اضغط رجوع مرة أخرى للخروج من التطبيق", Toast.LENGTH_SHORT).show()
-        }
+        super.onBackPressed()
     }
 
     private fun handleIncomingIntent(intent: Intent?) {
@@ -312,7 +360,7 @@ class MainActivity : BridgeActivity() {
 
     inner class EduTechAndroidBridge {
         @JavascriptInterface
-        fun getAppVersion(): String = "3.2.0"
+        fun getAppVersion(): String = "3.2.1"
 
         @JavascriptInterface
         fun saveBase64File(base64Data: String, fileName: String, mimeType: String, subFolder: String?): String {
@@ -357,6 +405,12 @@ class MainActivity : BridgeActivity() {
         }
 
         @JavascriptInterface
+        fun openVault() = openMyFolder()
+
+        @JavascriptInterface
+        fun openFileManager() = openMyFolder()
+
+        @JavascriptInterface
         fun openWhiteboard() {
             runOnUiThread { startActivity(Intent(this@MainActivity, SmartWhiteboardActivity::class.java)) }
         }
@@ -365,6 +419,10 @@ class MainActivity : BridgeActivity() {
         fun openBookReader() {
             runOnUiThread { startActivity(Intent(this@MainActivity, MoonBookReaderActivity::class.java)) }
         }
+
+        // Alias used by fresh-drawer-music.js & v289-android-bridge.js
+        @JavascriptInterface
+        fun openBookshelf() = openBookReader()
 
         @JavascriptInterface
         fun openMediaPlayer(url: String?, title: String?) {
@@ -393,6 +451,9 @@ class MainActivity : BridgeActivity() {
         }
 
         @JavascriptInterface
+        fun showFloatingAssistant() = startFloatingAi()
+
+        @JavascriptInterface
         fun stopFloatingAi() {
             runOnUiThread {
                 val svc = Intent(this@MainActivity, EduFloatingAiService::class.java).apply {
@@ -401,6 +462,9 @@ class MainActivity : BridgeActivity() {
                 startService(svc)
             }
         }
+
+        @JavascriptInterface
+        fun hideFloatingAssistant() = stopFloatingAi()
 
         @JavascriptInterface
         fun enterPiP() {

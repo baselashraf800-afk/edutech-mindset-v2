@@ -17,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity
 class EduSplashActivity : AppCompatActivity() {
     private var mediaPlayer: MediaPlayer? = null
     private var entered = false
-    private var audioCompleted = false
     private val handler = Handler(Looper.getMainLooper())
     private val fallbackRunnable = Runnable { enterApp() }
 
@@ -48,40 +47,38 @@ class EduSplashActivity : AppCompatActivity() {
 
                 @JavascriptInterface
                 fun onSplashDone() {
-                    if (audioCompleted) runOnUiThread { enterApp() }
+                    // Wait for audio completion unless user taps skip
                 }
             }, "EduSplashBridge")
             loadUrl("file:///android_asset/edu_cinematic_splash.html")
         }
         root.addView(wv)
         setContentView(root)
-        playFullIntroAudio()
+        playOriginal300IntroAudio()
     }
 
-    private fun playFullIntroAudio() {
+    private fun playOriginal300IntroAudio() {
         try {
-            val afd = assets.openFd("public/assets/audio-pack/welcome_ar.mp3")
+            // Use the exact rich cinematic intro audio extracted from EduTech-Mindset-3.0.0.apk
+            val afd = assets.openFd("edu_intro_300.mp3")
             val mp = MediaPlayer()
             mediaPlayer = mp
             mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
             afd.close()
             mp.setOnPreparedListener { player ->
-                val dur = player.duration.coerceIn(3500, 30000)
-                handler.postDelayed(fallbackRunnable, dur + 1200L)
+                val dur = player.duration.coerceIn(4000, 32000)
+                handler.postDelayed(fallbackRunnable, dur + 1000L)
                 player.start()
             }
             mp.setOnCompletionListener {
-                audioCompleted = true
-                handler.postDelayed({ enterApp() }, 600L)
+                handler.postDelayed({ enterApp() }, 450L)
             }
             mp.setOnErrorListener { _, _, _ ->
-                audioCompleted = true
                 handler.postDelayed(fallbackRunnable, 4000L)
                 true
             }
             mp.prepareAsync()
         } catch (_: Exception) {
-            audioCompleted = true
             handler.postDelayed(fallbackRunnable, 4000L)
         }
     }
