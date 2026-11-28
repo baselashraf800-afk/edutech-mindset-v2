@@ -1,5 +1,5 @@
 /* EduTech Mindset Service Worker — v291 */
-const VERSION = '3.3.0';
+const VERSION = '3.3.1';
 const CACHE_NAME = 'edutech-v3-stable-' + VERSION;
 const V = '?v=' + VERSION;
 const APP_SHELL = [
@@ -100,7 +100,8 @@ const APP_SHELL = [
   './js/worksheets.js' + V,
   './js/whiteboard.js' + V,
   './js/tawjihi.js' + V,
-  './js/export.js' + V
+  './js/export.js' + V,
+  './js/v330-power-suite.js' + V
 ];
 
 self.addEventListener('install', (event) => {
@@ -116,7 +117,11 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME && k !== CACHE_NAME + '-ext' && k !== 'edutech-books-offline-v3').map((k) => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    ).then(() => self.clients.claim()).then(() =>
+      self.clients.matchAll({ type: 'window' }).then((clients) => {
+        clients.forEach((c) => c.postMessage({ type: 'SW_UPDATED', version: VERSION }));
+      })
+    )
   );
 });
 
@@ -163,6 +168,20 @@ self.addEventListener('fetch', (event) => {
         }
         return res;
       }).catch(() => caches.match('./index.html', { ignoreSearch: true }).then((r) => r || caches.match('./', { ignoreSearch: true })).then((r) => r || caches.match('./offline.html')))
+    );
+    return;
+  }
+
+  // Stale-While-Revalidate for static JS/CSS/assets for instant loading on slow networks
+  if (/^\/(js|css|assets)\//.test(url.pathname)) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((c) => c.match(req).then((hit) => {
+        const net = fetch(req).then((res) => {
+          if (res && res.ok) c.put(req, res.clone()).catch(() => {});
+          return res;
+        }).catch(() => hit);
+        return hit || net;
+      }))
     );
     return;
   }

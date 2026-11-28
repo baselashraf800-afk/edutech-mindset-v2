@@ -6,6 +6,8 @@
 		"androidScheme": "https",
 		"allowNavigation": [
 			"edutech-mindset.pages.dev",
+			"www.edutechmindset.ps",
+			"edutechmindset.ps",
 			"edutech-mindset-claud.firebaseapp.com",
 			"*.firebaseapp.com",
 			"accounts.google.com",

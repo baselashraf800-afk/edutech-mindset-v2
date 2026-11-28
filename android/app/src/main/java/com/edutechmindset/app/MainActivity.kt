@@ -53,6 +53,7 @@ class MainActivity : BridgeActivity() {
         configureWebViewForAuthAndMedia()
         requestEssentialPermissions()
         handleIncomingIntent(intent)
+        checkForAppUpdate()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -64,6 +65,7 @@ class MainActivity : BridgeActivity() {
     private fun isAllowedInAppAuthHost(host: String): Boolean {
         val h = host.lowercase()
         return h.endsWith("edutech-mindset.pages.dev") ||
+            h.endsWith("edutechmindset.ps") ||
             h.endsWith("pages.dev") ||
             h.endsWith("firebaseapp.com") ||
             h.endsWith("accounts.google.com") ||
@@ -358,12 +360,93 @@ class MainActivity : BridgeActivity() {
         super.onDestroy()
     }
 
+    private fun isTrustedBridgeOrigin(): Boolean {
+        return try {
+            val wv = bridge?.webView ?: return false
+            var currentUrl = ""
+            if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+                currentUrl = wv.url ?: ""
+            } else {
+                val latch = java.util.concurrent.CountDownLatch(1)
+                runOnUiThread {
+                    currentUrl = wv.url ?: ""
+                    latch.countDown()
+                }
+                latch.await(500, java.util.concurrent.TimeUnit.MILLISECONDS)
+            }
+            if (currentUrl.isBlank()) return true
+            val host = Uri.parse(currentUrl).host?.lowercase() ?: return false
+            host == "localhost" ||
+                host == "127.0.0.1" ||
+                host == "edutech-mindset.pages.dev" ||
+                host.endsWith(".edutech-mindset.pages.dev") ||
+                host == "edutechmindset.ps" ||
+                host.endsWith(".edutechmindset.ps")
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun checkForAppUpdate() {
+        ioExecutor.execute {
+            try {
+                val prefs = getSharedPreferences("edutech_update_prefs", Context.MODE_PRIVATE)
+                val now = System.currentTimeMillis()
+                val lastCheck = prefs.getLong("last_check_ms", 0L)
+                if (now - lastCheck < 6 * 60 * 60 * 1000L) return@execute
+                prefs.edit().putLong("last_check_ms", now).apply()
+
+                val conn = (java.net.URL("https://api.github.com/repos/baselashraf800-afk/edutech-mindset-v2/releases/latest")
+                    .openConnection() as java.net.HttpURLConnection).apply {
+                    connectTimeout = 6000
+                    readTimeout = 6000
+                    setRequestProperty("Accept", "application/vnd.github+json")
+                    setRequestProperty("User-Agent", "EduTechMindset-Android/3.3.0")
+                }
+                if (conn.responseCode != 200) return@execute
+                val body = conn.inputStream.bufferedReader().use { it.readText() }
+                val json = org.json.JSONObject(body)
+                val tag = json.optString("tag_name", "").trim().removePrefix("v")
+                val htmlUrl = json.optString("html_url", "https://github.com/baselashraf800-afk/edutech-mindset-v2/releases/latest")
+                val currentVer = packageManager.getPackageInfo(packageName, 0).versionName ?: "3.3.0"
+                if (tag.isNotBlank() && isNewerVersion(tag, currentVer)) {
+                    runOnUiThread {
+                        if (isFinishing || isDestroyed) return@runOnUiThread
+                        androidx.appcompat.app.AlertDialog.Builder(this@MainActivity)
+                            .setTitle("✨ يتوفر إصدار جديد (v$tag)")
+                            .setMessage("تتوفر نسخة أحدث من تطبيق EduTech Mindset بتحسينات أمنية وأداء أسرع. هل تريد تحميلها الآن؟")
+                            .setPositiveButton("تحديث الآن") { _, _ ->
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(htmlUrl)))
+                            }
+                            .setNegativeButton("لاحقاً", null)
+                            .show()
+                    }
+                }
+            } catch (_: Exception) {
+                // Silent ignore when offline or rate-limited
+            }
+        }
+    }
+
+    private fun isNewerVersion(remote: String, local: String): Boolean {
+        val rParts = remote.split(".").map { it.filter(Char::isDigit).toIntOrNull() ?: 0 }
+        val lParts = local.split(".").map { it.filter(Char::isDigit).toIntOrNull() ?: 0 }
+        val maxLen = maxOf(rParts.size, lParts.size)
+        for (i in 0 until maxLen) {
+            val rv = rParts.getOrElse(i) { 0 }
+            val lv = lParts.getOrElse(i) { 0 }
+            if (rv != lv) return rv > lv
+        }
+        return false
+    }
+
     inner class EduTechAndroidBridge {
         @JavascriptInterface
-        fun getAppVersion(): String = "3.2.1"
+        fun getAppVersion(): String = "3.3.0"
 
         @JavascriptInterface
         fun saveBase64File(base64Data: String, fileName: String, mimeType: String, subFolder: String?): String {
+            if (!isTrustedBridgeOrigin()) return ""
             val res = EduFileSaver.saveBase64(this@MainActivity, base64Data, fileName, mimeType)
             runOnUiThread {
                 if (res.ok) {
@@ -381,6 +464,7 @@ class MainActivity : BridgeActivity() {
 
         @JavascriptInterface
         fun shareSavedFile(filePath: String, mimeType: String) {
+            if (!isTrustedBridgeOrigin()) return
             runOnUiThread { EduFileSaver.shareFile(this@MainActivity, filePath, mimeType) }
         }
 
@@ -401,6 +485,7 @@ class MainActivity : BridgeActivity() {
 
         @JavascriptInterface
         fun openMyFolder() {
+            if (!isTrustedBridgeOrigin()) return
             runOnUiThread { startActivity(Intent(this@MainActivity, MyFolderActivity::class.java)) }
         }
 
@@ -412,11 +497,13 @@ class MainActivity : BridgeActivity() {
 
         @JavascriptInterface
         fun openWhiteboard() {
+            if (!isTrustedBridgeOrigin()) return
             runOnUiThread { startActivity(Intent(this@MainActivity, SmartWhiteboardActivity::class.java)) }
         }
 
         @JavascriptInterface
         fun openBookReader() {
+            if (!isTrustedBridgeOrigin()) return
             runOnUiThread { startActivity(Intent(this@MainActivity, MoonBookReaderActivity::class.java)) }
         }
 

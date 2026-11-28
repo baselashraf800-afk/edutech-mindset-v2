@@ -1,35 +1,37 @@
 {
-  "appId": "com.edutechmindset.app",
-  "appName": "EduTech Mindset",
-  "webDir": "www",
-  "server": {
-    "url": "https://edutech-mindset.pages.dev",
-    "androidScheme": "https",
-    "cleartext": false,
-    "allowNavigation": [
-      "edutech-mindset.pages.dev",
-      "*.pages.dev",
-      "edutech-mindset-claud.firebaseapp.com",
-      "*.firebaseapp.com",
-      "accounts.google.com",
-      "accounts.youtube.com",
-      "*.youtube.com",
-      "*.google.com",
-      "*.google.ps",
-      "*.googleapis.com",
-      "*.gstatic.com",
-      "*.googleusercontent.com"
-    ]
-  },
-  "plugins": {
-    "SplashScreen": {
-      "launchShowDuration": 0,
-      "backgroundColor": "#020617",
-      "showSpinner": false
-    },
-    "LocalNotifications": {
-      "smallIcon": "ic_launcher",
-      "iconColor": "#0284C7"
-    }
-  }
+	"appId": "com.edutechmindset.app",
+	"appName": "EduTech Mindset",
+	"webDir": "www",
+	"server": {
+		"url": "https://edutech-mindset.pages.dev",
+		"androidScheme": "https",
+		"cleartext": false,
+		"allowNavigation": [
+			"edutech-mindset.pages.dev",
+			"www.edutechmindset.ps",
+			"edutechmindset.ps",
+			"*.pages.dev",
+			"edutech-mindset-claud.firebaseapp.com",
+			"*.firebaseapp.com",
+			"accounts.google.com",
+			"accounts.youtube.com",
+			"*.youtube.com",
+			"*.google.com",
+			"*.google.ps",
+			"*.googleapis.com",
+			"*.gstatic.com",
+			"*.googleusercontent.com"
+		]
+	},
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 0,
+			"backgroundColor": "#020617",
+			"showSpinner": false
+		},
+		"LocalNotifications": {
+			"smallIcon": "ic_launcher",
+			"iconColor": "#0284C7"
+		}
+	}
 }

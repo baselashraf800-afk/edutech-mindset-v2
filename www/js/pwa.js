@@ -184,7 +184,7 @@
     global.__eduDeferredPwaPrompt = e;
   });
 
-  var DEFAULT_APK_URL = "/downloads/EduTech-Mindset.apk";
+  var DEFAULT_APK_URL = "/download.html";
   function getApkUrl() {
     try { var u = (localStorage.getItem(APK_KEY) || "").trim(); return u || DEFAULT_APK_URL; } catch (e) { return DEFAULT_APK_URL; }
   }
